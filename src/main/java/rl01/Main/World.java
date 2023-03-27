@@ -20,7 +20,7 @@ public class World {
 		return height;
 	}
 	
-	private List<Creature> creatures;
+	public List<Creature> creatures;
 	
 	public World(Tile[][] tiles) {
 		this.tiles = tiles;
@@ -49,14 +49,24 @@ public class World {
 	        tiles[x][y] = Tile.FLOOR;
 	}
 	
+	public void remove(Creature other) {
+	    creatures.remove(other);
+	}
 	
-	
+		
 	public Creature creature(int x, int y){
 	    for (Creature c : creatures){
 	        if (c.x == x && c.y == y)
 	            return c;
 	    }
 	    return null;
+	}
+	
+	public void update(){
+	    List<Creature> toUpdate = new ArrayList<Creature>(creatures);
+	    for (Creature creature : toUpdate){
+	        creature.update();
+	    }
 	}
 		
 	public void addAtEmptyLocation(Creature creature){

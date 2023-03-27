@@ -15,5 +15,10 @@ public class CreatureAi {
 	    } else if (tile.isDiggable()) {
 	        creature.dig(x, y);
 	    }
-	}	
+	}
+
+	public void onUpdate() { }
+
+	public void onNotify(String format) { }
+	
 }
