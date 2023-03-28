@@ -10,7 +10,10 @@ public class Creature {
 	public int y;
 	public int z;
 
+	public String tag;
+
 	private char glyph;
+	
 
 	public char glyph() {
 		return glyph;
@@ -20,6 +23,14 @@ public class Creature {
 
 	public Color color() {
 		return color;
+	}
+	
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 
 	private CreatureAi ai;
@@ -52,7 +63,7 @@ public class Creature {
 		return defenseValue;
 	}
 
-	public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense) {
+	public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense, String tag) {
 		this.world = world;
 		this.glyph = glyph;
 		this.color = color;
@@ -60,6 +71,7 @@ public class Creature {
 		this.hp = maxHp;
 		this.attackValue = attack;
 		this.defenseValue = defense;
+		this.tag = tag;
 	}
 
 	public void dig(int wx, int wy, int wz) {
@@ -96,14 +108,14 @@ public class Creature {
     
         if (mz == -1){
             if (tile == Tile.STAIRS_DOWN) {
-                doAction("walk up the stairs to level %d", z+mz+1);
+                doAction("walk up the stairs to level %d", z+mz-1);               
             } else {
                 doAction("try to go up but are stopped by the cave ceiling");
                 return;
             }
         } else if (mz == 1){
             if (tile == Tile.STAIRS_UP) {
-                doAction("walk down the stairs to level %d", z+mz+1);
+                doAction("walk down the stairs to level %d", z+mz+1);               
             } else {
                 doAction("try to go down but are stopped by the cave floor");
                 return;
@@ -111,8 +123,8 @@ public class Creature {
         }
     
         Creature other = world.creature(x+mx, y+my, z+mz);
-    
-        if (other == null)
+   
+        if (other == null || other.tag.equals("player"))
             ai.onEnter(x+mx, y+my, z+mz, tile);
         else
             attack(other);

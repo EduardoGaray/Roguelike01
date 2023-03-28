@@ -32,16 +32,18 @@ public class PlayScreen implements Screen {
 		terminal.writeCenter("-- press [escape] to lose or [enter] to win --", 22);
 
 		String stats = String.format(" %3d/%3d hp", player.hp(), player.maxHp());
-		terminal.write(stats, 1, 23);
+		terminal.write(stats, 1, 21);
+		String level = String.format(" Floor: %3d", player.z+1);
+		terminal.write(level, 1, 22);
 		
 	}
+
+	
 
 	public Screen respondToUserInput(KeyEvent key) {
 		switch (key.getKeyCode()) {
 		case KeyEvent.VK_ESCAPE: return new LoseScreen();
 		case KeyEvent.VK_ENTER: return new WinScreen();
-		case '+': player.moveBy( 0, 0, -1); break;
-	    case '-': player.moveBy( 0, 0, 1); break;
 		case KeyEvent.VK_LEFT:
 		case KeyEvent.VK_H: player.moveBy(-1, 0, 0); break;
 		case KeyEvent.VK_RIGHT:
@@ -54,7 +56,9 @@ public class PlayScreen implements Screen {
 		case KeyEvent.VK_U: player.moveBy(1, -1, 0); break;
 		case KeyEvent.VK_B: player.moveBy(-1, 1, 0); break;
 		case KeyEvent.VK_N: player.moveBy(1, 1, 0); break;
-		}		
+		case KeyEvent.VK_ADD: player.moveBy( 0, 0, 1); break;
+		case KeyEvent.VK_SUBTRACT : player.moveBy( 0, 0, -1); break;
+		} 
 		world.update();
 		return this;
 	}
@@ -80,8 +84,7 @@ public class PlayScreen implements Screen {
 	public int getPlayerY() {
 		return Math.max(0, Math.min(player.y - screenHeight / 2, world.height() - screenHeight));
 	}
-	
-	
+		
 	private void displayMessages(AsciiPanel terminal, List<String> messages) {
 		int top = screenHeight - messages.size();
 		for (int i = 0; i < messages.size(); i++) {
@@ -97,14 +100,14 @@ public class PlayScreen implements Screen {
 			for (int y = 0; y < screenHeight; y++) {
 				int wx = x + left;
 				int wy = y + top;
-				int wz = 0;
+				int wz = player.z;
 				terminal.write(world.glyph(wx, wy, wz), x, y, world.color(wx, wy, wz));
 			}
 		} ///// Up until this point we have just displayed the world tiles, now we will
 			///// loop through creatures, check if in bounds, and display
 
 		for (Creature c : world.creatures) {
-			if ((c.x >= left && c.x < left + screenWidth) && (c.y >= top && c.y < top + screenHeight)) {
+			if ((c.x >= left && c.x < left + screenWidth) && (c.y >= top && c.y < top + screenHeight) && c.z == player.z) {
 				terminal.write(c.glyph(), c.x - left, c.y - top, c.color());
 			}
 		}

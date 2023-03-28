@@ -33,11 +33,14 @@ public class ApplicationMain extends JFrame implements KeyListener {
 		screen = screen.respondToUserInput(e);
 		repaint();
 	}
+		
 
 	public void keyReleased(KeyEvent e) {
 	}
 
 	public void keyTyped(KeyEvent e) {
+		screen = screen.respondToUserInput(e);
+		repaint();
 	}
 
 	public static void main(String[] args) {
