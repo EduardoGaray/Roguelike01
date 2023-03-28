@@ -202,8 +202,8 @@ public class WorldBuilder {
 	public WorldBuilder makeCaves() {
         return randomizeTiles()
              .smooth(8)
-             .createRegions();
-             //.connectRegions();
+             .createRegions()
+             .connectRegions();
     }
 
 }
