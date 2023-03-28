@@ -41,17 +41,17 @@ public class PlayScreen implements Screen {
 		case KeyEvent.VK_ESCAPE: return new LoseScreen();
 		case KeyEvent.VK_ENTER: return new WinScreen();
 		case KeyEvent.VK_LEFT:
-		case KeyEvent.VK_H: player.moveBy(-1, 0); break;
+		case KeyEvent.VK_H: player.moveBy(-1, 0, 0); break;
 		case KeyEvent.VK_RIGHT:
-		case KeyEvent.VK_L: player.moveBy(1, 0); break;
+		case KeyEvent.VK_L: player.moveBy(1, 0, 0); break;
 		case KeyEvent.VK_UP:
-		case KeyEvent.VK_K: player.moveBy(0, -1); break;
+		case KeyEvent.VK_K: player.moveBy(0, -1, 0); break;
 		case KeyEvent.VK_DOWN:
-		case KeyEvent.VK_J: player.moveBy(0, 1); break;
-		case KeyEvent.VK_Y: player.moveBy(-1, -1); break;
-		case KeyEvent.VK_U: player.moveBy(1, -1); break;
-		case KeyEvent.VK_B: player.moveBy(-1, 1); break;
-		case KeyEvent.VK_N: player.moveBy(1, 1); break;
+		case KeyEvent.VK_J: player.moveBy(0, 1, 0); break;
+		case KeyEvent.VK_Y: player.moveBy(-1, -1, 0); break;
+		case KeyEvent.VK_U: player.moveBy(1, -1, 0); break;
+		case KeyEvent.VK_B: player.moveBy(-1, 1, 0); break;
+		case KeyEvent.VK_N: player.moveBy(1, 1, 0); break;
 		}		
 		world.update();
 		return this;
@@ -68,7 +68,7 @@ public class PlayScreen implements Screen {
 	}
 
 	private void createWorld() {
-		world = new WorldBuilder(90, 31).makeCaves().build();
+		world = new WorldBuilder(90, 31, 10).makeCaves().build();
 	}
 
 	public int getPlayerX() {
@@ -95,7 +95,8 @@ public class PlayScreen implements Screen {
 			for (int y = 0; y < screenHeight; y++) {
 				int wx = x + left;
 				int wy = y + top;
-				terminal.write(world.glyph(wx, wy), x, y, world.color(wx, wy));
+				int wz = 0;
+				terminal.write(world.glyph(wx, wy, wz), x, y, world.color(wx, wy, wz));
 			}
 		} ///// Up until this point we have just displayed the world tiles, now we will
 			///// loop through creatures, check if in bounds, and display

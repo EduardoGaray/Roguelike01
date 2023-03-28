@@ -8,6 +8,7 @@ public class Creature {
 
 	public int x;
 	public int y;
+	public int z;
 
 	private char glyph;
 
@@ -61,8 +62,8 @@ public class Creature {
 		this.defenseValue = defense;
 	}
 
-	public void dig(int wx, int wy) {
-		world.dig(wx, wy);
+	public void dig(int wx, int wy, int wz) {
+		world.dig(wx, wy, wz);
 	}
 
 	public void attack(Creature other) {
@@ -82,19 +83,19 @@ public class Creature {
 			world.remove(this);
 	}
 
-	public boolean canEnter(int wx, int wy) {
-		return world.tile(wx, wy).isGround() && world.creature(wx, wy) == null;
+	public boolean canEnter(int wx, int wy, int wz) {
+		return world.tile(wx, wy, wz).isGround() && world.creature(wx, wy, wz) == null;
 	}
 
 	public void update() {
 		ai.onUpdate();
 	}
 
-	public void moveBy(int mx, int my) {
-		Creature other = world.creature(x + mx, y + my);
+	public void moveBy(int mx, int my, int mz) {
+		Creature other = world.creature(x + mx, y + my, z +mz);
 
 		if (other == null) {
-			ai.onEnter(x + mx, y + my, world.tile(x + mx, y + my));
+			ai.onEnter(x + mx, y + my, mz, world.tile(x + mx, y + my, z + mz));
 		} else {
 			attack(other);
 		}
@@ -111,7 +112,7 @@ public class Creature {
 				if (ox * ox + oy * oy > r * r)
 					continue;
 
-				Creature other = world.creature(x + ox, y + oy);
+				Creature other = world.creature(x + ox, y + oy, z);
 
 				if (other == null)
 					continue;
@@ -136,4 +137,16 @@ public class Creature {
 
 		return builder.toString().trim();
 	}
+	
+	private int visionRadius;
+    public int visionRadius() { return visionRadius; }
+
+    public boolean canSee(int wx, int wy, int wz){
+        return ai.canSee(wx, wy, wz);
+    }
+
+    public Tile tile(int wx, int wy, int wz) {
+        return world.tile(wx, wy, wz);
+    }
+
 }
