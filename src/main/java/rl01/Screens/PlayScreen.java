@@ -40,6 +40,8 @@ public class PlayScreen implements Screen {
 		switch (key.getKeyCode()) {
 		case KeyEvent.VK_ESCAPE: return new LoseScreen();
 		case KeyEvent.VK_ENTER: return new WinScreen();
+		case '<': player.moveBy( 0, 0, -1); break;
+	    case '>': player.moveBy( 0, 0, 1); break;
 		case KeyEvent.VK_LEFT:
 		case KeyEvent.VK_H: player.moveBy(-1, 0, 0); break;
 		case KeyEvent.VK_RIGHT:
@@ -68,7 +70,7 @@ public class PlayScreen implements Screen {
 	}
 
 	private void createWorld() {
-		world = new WorldBuilder(90, 31, 10).makeCaves().build();
+		world = new WorldBuilder(90, 31, 1).makeCaves().build();
 	}
 
 	public int getPlayerX() {

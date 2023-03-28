@@ -91,15 +91,32 @@ public class Creature {
 		ai.onUpdate();
 	}
 
-	public void moveBy(int mx, int my, int mz) {
-		Creature other = world.creature(x + mx, y + my, z +mz);
-
-		if (other == null) {
-			ai.onEnter(x + mx, y + my, mz, world.tile(x + mx, y + my, z + mz));
-		} else {
-			attack(other);
-		}
-	}
+	public void moveBy(int mx, int my, int mz){
+        Tile tile = world.tile(x+mx, y+my, z+mz);
+    
+        if (mz == -1){
+            if (tile == Tile.STAIRS_DOWN) {
+                doAction("walk up the stairs to level %d", z+mz+1);
+            } else {
+                doAction("try to go up but are stopped by the cave ceiling");
+                return;
+            }
+        } else if (mz == 1){
+            if (tile == Tile.STAIRS_UP) {
+                doAction("walk down the stairs to level %d", z+mz+1);
+            } else {
+                doAction("try to go down but are stopped by the cave floor");
+                return;
+            }
+        }
+    
+        Creature other = world.creature(x+mx, y+my, z+mz);
+    
+        if (other == null)
+            ai.onEnter(x+mx, y+my, z+mz, tile);
+        else
+            attack(other);
+    }
 
 	public void notify(String message, Object... params) {
 		ai.onNotify(String.format(message, params));
