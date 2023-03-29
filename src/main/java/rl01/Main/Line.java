@@ -25,7 +25,7 @@ public class Line implements Iterable<Point> {
                 break;
         
             int e2 = err * 2;
-            if (e2 > -dx) {
+            if (e2 > -dy) {
                 err -= dy;
                 x0 += sx;
             }

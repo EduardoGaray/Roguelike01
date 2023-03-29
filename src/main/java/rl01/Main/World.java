@@ -43,12 +43,13 @@ public class World {
 			return tiles[x][y][z];
 	}
 
-	public char glyph(int x, int y, int z) {
-		return tile(x, y, z).glyph();
+	public char glyph(int x, int y, int z){
+	    Creature creature = creature(x, y, z);
+	    return creature != null ? creature.glyph() : tile(x, y, z).glyph();
 	}
-
-	public Color color(int x, int y, int z) {
-		return tile(x, y, z).color();
+	public Color color(int x, int y, int z){
+	    Creature creature = creature(x, y, z);
+	    return creature != null ? creature.color() : tile(x, y, z).color();
 	}
 	
 	public void dig(int x, int y, int z) {
@@ -75,6 +76,8 @@ public class World {
 	        creature.update();
 	    }
 	}
+	
+	
 		
 	public void addAtEmptyLocation(Creature creature, int z){
         int x;

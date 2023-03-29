@@ -1,5 +1,6 @@
 package rl01.Screens;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import asciiPanel.AsciiPanel;
 import rl01.Main.Creature;
 import rl01.Main.CreatureFactory;
+import rl01.Main.FieldOfView;
 import rl01.Main.World;
 import rl01.Main.WorldBuilder;
 
@@ -14,6 +16,7 @@ public class PlayScreen implements Screen {
 
 	private World world;
 	private Creature player;
+	private FieldOfView fov;
 	private int screenWidth;
 	private int screenHeight;
 	
@@ -68,7 +71,7 @@ public class PlayScreen implements Screen {
 		screenHeight = 21;
 		messages = new ArrayList<String>();
 		createWorld();
-
+		fov = new FieldOfView(world);
 		CreatureFactory creatureFactory = new CreatureFactory(world);
 		createCreatures(creatureFactory);
 	}
@@ -92,26 +95,23 @@ public class PlayScreen implements Screen {
 		}
 		messages.clear();
 	}
-
+	
 	private void displayTiles(AsciiPanel terminal, int left, int top) {
-		// display all the tiles, then loop through creatures and display them if in
-		// range
-		for (int x = 0; x < screenWidth; x++) {
-			for (int y = 0; y < screenHeight; y++) {
-				int wx = x + left;
-				int wy = y + top;
-				int wz = player.z;
-				terminal.write(world.glyph(wx, wy, wz), x, y, world.color(wx, wy, wz));
-			}
-		} ///// Up until this point we have just displayed the world tiles, now we will
-			///// loop through creatures, check if in bounds, and display
+	    fov.update(player.x, player.y, player.z, player.visionRadius());
+	    
+	    for (int x = 0; x < screenWidth; x++){
+	        for (int y = 0; y < screenHeight; y++){
+	            int wx = x + left;
+	            int wy = y + top;
 
-		for (Creature c : world.creatures) {
-			if ((c.x >= left && c.x < left + screenWidth) && (c.y >= top && c.y < top + screenHeight) && c.z == player.z) {
-				terminal.write(c.glyph(), c.x - left, c.y - top, c.color());
-			}
-		}
+	            if (player.canSee(wx, wy, player.z))
+	                terminal.write(world.glyph(wx, wy, player.z), x, y, world.color(wx, wy, player.z));
+	            else
+	                terminal.write(fov.tile(wx, wy, player.z).glyph(), x, y, Color.darkGray);
+	        }
+	    }
 	}
+	
 
 	private void createCreatures(CreatureFactory creatureFactory){
 	    player = creatureFactory.newPlayer(messages);
