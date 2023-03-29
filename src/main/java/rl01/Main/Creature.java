@@ -69,8 +69,12 @@ public class Creature {
 	public int visionRadius() {
 		return visionRadius;
 	}
+	
+	private String name;
+    public String name() { return name; }
 
-	public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense, String tag, int visionRadius) {
+
+	public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense, String tag, int visionRadius, String name) {
 		this.world = world;
 		this.glyph = glyph;
 		this.color = color;
@@ -80,6 +84,7 @@ public class Creature {
 		this.defenseValue = defense;
 		this.tag = tag;
 		this.visionRadius = visionRadius;
+		this.name = name;
 	}
 
 	public void dig(int wx, int wy, int wz) {
@@ -90,7 +95,7 @@ public class Creature {
 		int amount = Math.max(0, attackValue() - other.defenseValue());
 
 		amount = (int) (Math.random() * amount) + 1;
-		doAction("attack the '%s' for %d damage", other.glyph, amount);
+		doAction("attack the '%s' for %d damage", other.name, amount);
 		other.modifyHp(-amount);
 
 	}
@@ -113,7 +118,8 @@ public class Creature {
 
 	public void moveBy(int mx, int my, int mz){
         Tile tile = world.tile(x+mx, y+my, z+mz);
-    
+        if (mx==0 && my==0 && mz==0)
+            return;
         if (mz == -1){
             if (tile == Tile.STAIRS_DOWN) {
                 doAction("walk up the stairs to level %d", z+mz-1);               
@@ -157,7 +163,7 @@ public class Creature {
 	            if (other == this)
 	                other.notify("You " + message + ".", params);
 	            else if (other.canSee(x, y, z))
-	                other.notify(String.format("The %s %s.", other.glyph, makeSecondPerson(message)), params);
+	                other.notify(String.format("The %s %s.", other.name, makeSecondPerson(message)), params);
 	         }
 	    }
 	}
@@ -182,6 +188,10 @@ public class Creature {
         
     public Tile tile(int wx, int wy, int wz) {
         return world.tile(wx, wy, wz);
+    }
+
+    public Creature creature(int wx, int wy, int wz) {
+        return world.creature(wx, wy, wz);
     }
 
 	

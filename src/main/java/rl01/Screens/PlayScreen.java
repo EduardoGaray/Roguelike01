@@ -63,6 +63,8 @@ public class PlayScreen implements Screen {
 		case KeyEvent.VK_SUBTRACT : player.moveBy( 0, 0, -1); break;
 		} 
 		world.update();
+		if (player.hp() < 1)
+		    return new LoseScreen();
 		return this;
 	}
 	
@@ -117,7 +119,11 @@ public class PlayScreen implements Screen {
 	    player = creatureFactory.newPlayer(messages);
 	    
 	    for (int i = 0; i < 8; i++){
-	        creatureFactory.newFungus();
+        creatureFactory.newFungus();
+	    }
+	    
+	    for (int i = 0; i < 20; i++){
+	        creatureFactory.newBat();
 	    }
 	}
 

@@ -29,6 +29,7 @@ public enum Tile {
 	    return this == Tile.WALL;
 	}
 	
+	//Warning if the tile is unknow is considered ground too, this causes problems with fungi spread, needs a solution
 	public boolean isGround() {
 	    return this != WALL && this != BOUNDS;
 	}
