@@ -14,6 +14,7 @@ public class Creature {
 	public String tag;
 
 	private char glyph;
+	
 
 	public char glyph() {
 		return glyph;
@@ -24,7 +25,7 @@ public class Creature {
 	public Color color() {
 		return color;
 	}
-
+	
 	public String getTag() {
 		return tag;
 	}
@@ -62,27 +63,18 @@ public class Creature {
 	public int defenseValue() {
 		return defenseValue;
 	}
-
+	
 	private int visionRadius;
 
 	public int visionRadius() {
 		return visionRadius;
 	}
-
+	
 	private String name;
+    public String name() { return name; }
 
-	public String name() {
-		return name;
-	}
 
-	private Inventory inventory;
-
-	public Inventory inventory() {
-		return inventory;
-	}
-
-	public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense, String tag,
-			int visionRadius, String name) {
+	public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense, String tag, int visionRadius, String name) {
 		this.world = world;
 		this.glyph = glyph;
 		this.color = color;
@@ -93,7 +85,6 @@ public class Creature {
 		this.tag = tag;
 		this.visionRadius = visionRadius;
 		this.name = name;
-		this.inventory = new Inventory(20);
 	}
 
 	public void dig(int wx, int wy, int wz) {
@@ -114,7 +105,7 @@ public class Creature {
 
 		if (hp < 1)
 			doAction("die");
-		world.remove(this);
+			world.remove(this);
 	}
 
 	public boolean canEnter(int wx, int wy, int wz) {
@@ -125,56 +116,56 @@ public class Creature {
 		ai.onUpdate();
 	}
 
-	public void moveBy(int mx, int my, int mz) {
-		Tile tile = world.tile(x + mx, y + my, z + mz);
-		if (mx == 0 && my == 0 && mz == 0)
-			return;
-		if (mz == -1) {
-			if (tile == Tile.STAIRS_DOWN) {
-				doAction("walk up the stairs to level %d", z + mz - 1);
-			} else {
-				doAction("try to go up but are stopped by the cave ceiling");
-				return;
-			}
-		} else if (mz == 1) {
-			if (tile == Tile.STAIRS_UP) {
-				doAction("walk down the stairs to level %d", z + mz + 1);
-			} else {
-				doAction("try to go down but are stopped by the cave floor");
-				return;
-			}
-		}
-
-		Creature other = world.creature(x + mx, y + my, z + mz);
-
-		if (other == null || other.tag.equals("player"))
-			ai.onEnter(x + mx, y + my, z + mz, tile);
-		else
-			attack(other);
-	}
+	public void moveBy(int mx, int my, int mz){
+        Tile tile = world.tile(x+mx, y+my, z+mz);
+        if (mx==0 && my==0 && mz==0)
+            return;
+        if (mz == -1){
+            if (tile == Tile.STAIRS_DOWN) {
+                doAction("walk up the stairs to level %d", z+mz-1);               
+            } else {
+                doAction("try to go up but are stopped by the cave ceiling");
+                return;
+            }
+        } else if (mz == 1){
+            if (tile == Tile.STAIRS_UP) {
+                doAction("walk down the stairs to level %d", z+mz+1);               
+            } else {
+                doAction("try to go down but are stopped by the cave floor");
+                return;
+            }
+        }
+    
+        Creature other = world.creature(x+mx, y+my, z+mz);
+   
+        if (other == null || other.tag.equals("player"))
+            ai.onEnter(x+mx, y+my, z+mz, tile);
+        else
+            attack(other);
+    }
 
 	public void notify(String message, Object... params) {
 		ai.onNotify(String.format(message, params));
 	}
 
-	public void doAction(String message, Object... params) {
-		int r = 9;
-		for (int ox = -r; ox < r + 1; ox++) {
-			for (int oy = -r; oy < r + 1; oy++) {
-				if (ox * ox + oy * oy > r * r)
-					continue;
-
-				Creature other = world.creature(x + ox, y + oy, z);
-
-				if (other == null)
-					continue;
-
-				if (other == this)
-					other.notify("You " + message + ".", params);
-				else if (other.canSee(x, y, z))
-					other.notify(String.format("The %s %s.", other.name, makeSecondPerson(message)), params);
-			}
-		}
+	public void doAction(String message, Object ... params){
+	    int r = 9;
+	    for (int ox = -r; ox < r+1; ox++){
+	        for (int oy = -r; oy < r+1; oy++){
+	            if (ox*ox + oy*oy > r*r)
+	                continue;
+	         
+	            Creature other = world.creature(x+ox, y+oy, z);
+	         
+	            if (other == null)
+	                continue;
+	         
+	            if (other == this)
+	                other.notify("You " + message + ".", params);
+	            else if (other.canSee(x, y, z))
+	                other.notify(String.format("The %s %s.", other.name, makeSecondPerson(message)), params);
+	         }
+	    }
 	}
 
 	private String makeSecondPerson(String text) {
@@ -189,35 +180,20 @@ public class Creature {
 
 		return builder.toString().trim();
 	}
+	
+   public boolean canSee(int wx, int wy, int wz){
+        return ai.canSee(wx, wy, wz);
+    }
+    
+        
+    public Tile tile(int wx, int wy, int wz) {
+        return world.tile(wx, wy, wz);
+    }
 
-	public boolean canSee(int wx, int wy, int wz) {
-		return ai.canSee(wx, wy, wz);
-	}
+    public Creature creature(int wx, int wy, int wz) {
+        return world.creature(wx, wy, wz);
+    }
 
-	public void pickup() {
-		Item item = world.item(x, y, z);
-
-		if (inventory.isFull() || item == null) {
-			doAction("grab at the ground");
-		} else {
-			doAction("pickup a %s", item.name());
-			world.remove(x, y, z);
-			inventory.add(item);
-		}
-	}
-
-	public void drop(Item item) {
-		doAction("drop a " + item.name());
-		inventory.remove(item);
-		world.addAtEmptySpace(item, x, y, z);
-	}
-
-	public Tile tile(int wx, int wy, int wz) {
-		return world.tile(wx, wy, wz);
-	}
-
-	public Creature creature(int wx, int wy, int wz) {
-		return world.creature(wx, wy, wz);
-	}
+	
 
 }
