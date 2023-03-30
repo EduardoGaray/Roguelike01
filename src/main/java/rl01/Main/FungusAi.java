@@ -2,10 +2,10 @@ package rl01.Main;
 
 public class FungusAi extends CreatureAi {
 	
-	 private CreatureFactory factory;
+	 private EntityFactory factory;
 	 private int spreadcount;
 	 
-    public FungusAi(Creature creature, CreatureFactory factory) {
+    public FungusAi(Creature creature, EntityFactory factory) {
     	 super(creature);
          this.factory = factory;
     }
