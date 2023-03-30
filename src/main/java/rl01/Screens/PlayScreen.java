@@ -97,6 +97,9 @@ public class PlayScreen implements Screen {
 			case KeyEvent.VK_E:
 				subscreen = new EatScreen(player);
 				break;
+			case KeyEvent.VK_W:
+				subscreen = new EquipScreen(player);
+				break;
 			}
 
 			switch (key.getKeyChar()) {
@@ -191,6 +194,9 @@ public class PlayScreen implements Screen {
 			}
 		}
 		factory.newVictoryItem(world.depth() - 1);
+		factory.newEdibleWeapon(world.depth() - 1);
+		factory.randomArmor(world.depth() - 1);
+		factory.randomWeapon(world.depth() - 1);
 	}
 
 	private boolean userIsTryingToExit() {

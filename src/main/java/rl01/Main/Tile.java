@@ -5,8 +5,8 @@ import asciiPanel.AsciiPanel;
 
 public enum Tile {
 
-	FLOOR((char) 250, AsciiPanel.yellow), WALL((char) 177, AsciiPanel.yellow), BOUNDS('x', AsciiPanel.brightBlack),
-	STAIRS_DOWN('>', AsciiPanel.white),STAIRS_UP('<', AsciiPanel.white), UNKNOWN(' ', AsciiPanel.white);
+	FLOOR((char) 250, AsciiPanel.yellow, false), WALL((char) 177, AsciiPanel.yellow, true), BOUNDS('x', AsciiPanel.brightBlack, true),
+	STAIRS_DOWN('>', AsciiPanel.white, false),STAIRS_UP('<', AsciiPanel.white, false), UNKNOWN(' ', AsciiPanel.white, false);
 
 	private char glyph;
 
@@ -20,9 +20,15 @@ public enum Tile {
 		return color;
 	}
 
-	Tile(char glyph, Color color) {
+	Tile(char glyph, Color color, boolean impassable) {
 		this.glyph = glyph;
 		this.color = color;
+		this.impassable = impassable;
+	}
+	
+	private boolean impassable;
+	public boolean impassable() {
+		return impassable;
 	}
 	
 	public boolean isDiggable() {
@@ -31,7 +37,7 @@ public enum Tile {
 	
 	//Warning if the tile is unknow is considered ground too, this causes problems with fungi spread, needs a solution
 	public boolean isGround() {
-	    return this != WALL && this != BOUNDS;
+	    return this != WALL && this != BOUNDS && this != UNKNOWN;
 	}
 	
 }

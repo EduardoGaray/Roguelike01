@@ -39,6 +39,14 @@ public class Creature {
 		this.ai = ai;
 	}
 
+	public FieldOfView getFov() {
+		return fov;
+	}
+
+	public void setFov(FieldOfView fov) {
+		this.fov = fov;
+	}
+
 	private int maxHp;
 
 	public int maxHp() {
@@ -52,16 +60,18 @@ public class Creature {
 	}
 
 	private int attackValue;
-
 	public int attackValue() {
-		return attackValue;
-	}
+	    return attackValue
+	     + (weapon == null ? 0 : weapon.attackValue())
+	     + (armor == null ? 0 : armor.attackValue());
+	  }
 
-	private int defenseValue;
-
-	public int defenseValue() {
-		return defenseValue;
-	}
+	  private int defenseValue;
+	  public int defenseValue() {
+	    return defenseValue
+	     + (weapon == null ? 0 : weapon.defenseValue())
+	     + (armor == null ? 0 : armor.defenseValue());
+	  }
 
 	private int visionRadius;
 
@@ -160,9 +170,13 @@ public class Creature {
 		Creature other = world.creature(x + mx, y + my, z + mz);
 
 		if (other == null || other.tag.equals("player"))
+		{
 			ai.onEnter(x + mx, y + my, z + mz, tile);
+		}
 		else
+		{
 			attack(other);
+		}			
 	}
 
 	public void notify(String message, Object... params) {
@@ -184,7 +198,7 @@ public class Creature {
 				if (other == this)
 					other.notify("You " + message + ".", params);
 				else if (other.canSee(x, y, z))
-					other.notify(String.format("The %s %s.", other.name, makeSecondPerson(message)), params);
+					other.notify(String.format("The %s %s.", other.name, makeSecondPerson(message)), params);					
 			}
 		}
 	}
@@ -221,6 +235,7 @@ public class Creature {
 	public void drop(Item item) {
 		doAction("drop a " + item.name());
 		inventory.remove(item);
+		unequip(item);
 		world.addAtEmptySpace(item, x, y, z);
 	}
 
@@ -256,7 +271,43 @@ public class Creature {
 	}
 
 	public void eat(Item item){
-	    modifyFood(item.foodValue());
-	    inventory.remove(item);
-	}
+	      if (item.foodValue() < 0)
+	         notify("Gross!");
+	  
+	      modifyFood(item.foodValue());
+	      inventory.remove(item);
+	      unequip(item);
+	  }
+	
+	private Item weapon;
+	  public Item weapon() { return weapon; }
+
+	  private Item armor;
+	  public Item armor() { return armor; }
+	public void unequip(Item item){
+	      if (item == null)
+	         return;
+	  
+	      if (item == armor){
+	          doAction("remove a " + item.name());
+	          armor = null;
+	      } else if (item == weapon) {
+	          doAction("put away a " + item.name());
+	          weapon = null;
+	      }
+	  }
+	public void equip(Item item){
+	      if (item.attackValue() == 0 && item.defenseValue() == 0)
+	          return;
+	  
+	      if (item.attackValue() >= item.defenseValue()){
+	          unequip(weapon);
+	          doAction("wield a " + item.name());
+	          weapon = item;
+	      } else {
+	          unequip(armor);
+	          doAction("put on a " + item.name());
+	          armor = item;
+	      }
+	  }
 }
