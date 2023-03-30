@@ -7,10 +7,8 @@ import java.util.ArrayList;
 
 import asciiPanel.AsciiPanel;
 import rl01.Main.Creature;
-import rl01.Main.EntityFactory;
+import rl01.Main.CreatureFactory;
 import rl01.Main.FieldOfView;
-import rl01.Main.Item;
-import rl01.Main.Tile;
 import rl01.Main.World;
 import rl01.Main.WorldBuilder;
 
@@ -21,8 +19,6 @@ public class PlayScreen implements Screen {
 	private FieldOfView fov;
 	private int screenWidth;
 	private int screenHeight;
-	
-	private Screen subscreen;
 	
 	private List<String> messages;
 
@@ -36,58 +32,41 @@ public class PlayScreen implements Screen {
 
 		terminal.write(player.glyph(), player.x - left, player.y - top, player.color());
 
+		terminal.writeCenter("-- press [escape] to lose or [enter] to win --", 22);
+
 		String stats = String.format(" %3d/%3d hp", player.hp(), player.maxHp());
 		terminal.write(stats, 1, 21);
 		String level = String.format(" Floor: %3d", player.z+1);
 		terminal.write(level, 1, 22);
-		if (subscreen != null)
-		    subscreen.displayOutput(terminal);
 		
 	}
 
 	
 
 	public Screen respondToUserInput(KeyEvent key) {
-	     if (subscreen != null) {
-	         subscreen = subscreen.respondToUserInput(key);
-	     } else {
-	         switch (key.getKeyCode()){
-	         case KeyEvent.VK_LEFT:
-	         case KeyEvent.VK_H: player.moveBy(-1, 0, 0); break;
-	         case KeyEvent.VK_RIGHT:
-	         case KeyEvent.VK_L: player.moveBy( 1, 0, 0); break;
-	         case KeyEvent.VK_UP:
-	         case KeyEvent.VK_K: player.moveBy( 0,-1, 0); break;
-	         case KeyEvent.VK_DOWN:
-	         case KeyEvent.VK_J: player.moveBy( 0, 1, 0); break;
-	         case KeyEvent.VK_Y: player.moveBy(-1,-1, 0); break;
-	         case KeyEvent.VK_U: player.moveBy( 1,-1, 0); break;
-	         case KeyEvent.VK_B: player.moveBy(-1, 1, 0); break;
-	         case KeyEvent.VK_N: player.moveBy( 1, 1, 0); break;
-	         case KeyEvent.VK_D: subscreen = new DropScreen(player); break;
-	         }
-	        
-	         switch (key.getKeyChar()){
-	         case 'g':
-	         case ',': player.pickup(); break;
-	         case '-':
-	             if (userIsTryingToExit())
-	              return userExits();
-	             else
-	              player.moveBy( 0, 0, -1); 
-	             break;
-	         case '+': player.moveBy( 0, 0, 1); break;
-	         }
-	     }
-	    
-	     if (subscreen == null)
-	         world.update();
-	    
-	     if (player.hp() < 1)
-	         return new LoseScreen();
-	    
-	     return this;
-	 }
+		switch (key.getKeyCode()) {
+		case KeyEvent.VK_ESCAPE: return new LoseScreen();
+		case KeyEvent.VK_ENTER: return new WinScreen();
+		case KeyEvent.VK_LEFT:
+		case KeyEvent.VK_H: player.moveBy(-1, 0, 0); break;
+		case KeyEvent.VK_RIGHT:
+		case KeyEvent.VK_L: player.moveBy(1, 0, 0); break;
+		case KeyEvent.VK_UP:
+		case KeyEvent.VK_K: player.moveBy(0, -1, 0); break;
+		case KeyEvent.VK_DOWN:
+		case KeyEvent.VK_J: player.moveBy(0, 1, 0); break;
+		case KeyEvent.VK_Y: player.moveBy(-1, -1, 0); break;
+		case KeyEvent.VK_U: player.moveBy(1, -1, 0); break;
+		case KeyEvent.VK_B: player.moveBy(-1, 1, 0); break;
+		case KeyEvent.VK_N: player.moveBy(1, 1, 0); break;
+		case KeyEvent.VK_ADD: player.moveBy( 0, 0, 1); break;
+		case KeyEvent.VK_SUBTRACT : player.moveBy( 0, 0, -1); break;
+		} 
+		world.update();
+		if (player.hp() < 1)
+		    return new LoseScreen();
+		return this;
+	}
 	
 	public PlayScreen(){
 		screenWidth = 80;
@@ -95,9 +74,8 @@ public class PlayScreen implements Screen {
 		messages = new ArrayList<String>();
 		createWorld();
 		fov = new FieldOfView(world);
-		EntityFactory creatureFactory = new EntityFactory(world);
+		CreatureFactory creatureFactory = new CreatureFactory(world);
 		createCreatures(creatureFactory);
-		createItems(creatureFactory);
 	}
 
 	private void createWorld() {
@@ -137,7 +115,7 @@ public class PlayScreen implements Screen {
 	}
 	
 
-	private void createCreatures(EntityFactory creatureFactory){
+	private void createCreatures(CreatureFactory creatureFactory){
 	    player = creatureFactory.newPlayer(messages);
 	    
 	    for (int i = 0; i < 8; i++){
@@ -147,27 +125,6 @@ public class PlayScreen implements Screen {
 	    for (int i = 0; i < 20; i++){
 	        creatureFactory.newBat();
 	    }
-	}
-	
-	private void createItems(EntityFactory factory) {
-	    for (int z = 0; z < world.depth(); z++){
-	        for (int i = 0; i < world.width() * world.height() / 20; i++){
-	            factory.newRock(z);
-	        }
-	    }
-	    factory.newVictoryItem(world.depth() - 1);
-	}
-	
-	private boolean userIsTryingToExit(){
-	    return player.z == 0 && world.tile(player.x, player.y, player.z) == Tile.STAIRS_UP;
-	}
-
-	private Screen userExits(){
-	    for (Item item : player.inventory().getItems()){
-	        if (item != null && item.name().equals("teddy bear"))
-	            return new WinScreen();
-	    }
-	    return new LoseScreen();
 	}
 
 }
