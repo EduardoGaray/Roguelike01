@@ -37,6 +37,15 @@ public class EntityFactory {
 		new BatAi(bat);
 		return bat;
 	}
+	
+	public Creature newZombie(Creature player){
+	      Creature zombie = new Creature(world, 'z', AsciiPanel.white,50, 10, 10, "creature", 9, "Zombie");
+	      Random rand = new Random();
+		  int randomDepth = rand.nextInt(world.depth());
+	      world.addAtEmptyLocation(zombie,randomDepth);
+	      new ZombieAi(zombie, player);
+	      return zombie;
+	  }
 
 	public Item newRock(int depth) {
 		Item rock = new Item(',', AsciiPanel.yellow, "rock");

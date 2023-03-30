@@ -185,6 +185,10 @@ public class PlayScreen implements Screen {
 		for (int i = 0; i < 20; i++) {
 			creatureFactory.newBat();
 		}
+		
+		for (int i = 0; i < 5; i++){
+			creatureFactory.newZombie(player);
+	     }
 	}
 
 	private void createItems(EntityFactory factory) {

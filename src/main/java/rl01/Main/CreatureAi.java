@@ -9,7 +9,7 @@ public class CreatureAi {
 	}
 	
 	public void onEnter(int x, int y, int z, Tile tile){
-	    if (tile.isGround()){
+	    if (tile.isGround() && creature.canEnter(x, y, z)){
 	         creature.x = x;
 	         creature.y = y;
 	         creature.z = z;
@@ -24,7 +24,7 @@ public class CreatureAi {
 	    
 	    Creature other = creature.creature(creature.x + mx, creature.y + my, creature.z);
 	    
-	    if (other != null && other.glyph() == creature.glyph())
+	    if (other != null && other.glyph() == creature.glyph() && !other.canEnter(creature.x + mx, creature.y + my, creature.z))
 	        return;
 	    else
 	        creature.moveBy(mx, my, 0);
