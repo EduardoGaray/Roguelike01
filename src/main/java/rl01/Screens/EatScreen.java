@@ -6,12 +6,25 @@ import asciiPanel.AsciiPanel;
 import rl01.Main.Creature;
 import rl01.Main.Item;
 
-public class DropScreen extends InventoryBasedScreen {
+public class EatScreen extends InventoryBasedScreen {
 
-    public DropScreen(Creature player) {
+    public EatScreen(Creature player) {
         super(player);
     }
 
+    protected String getVerb() {
+        return "eat";
+    }
+
+    protected boolean isAcceptable(Item item) {
+        return item.foodValue() != 0;
+    }
+
+    protected Screen use(Item item) {
+        player.eat(item);
+        return null;
+    }
+	
     public void displayOutput(AsciiPanel terminal) {
         ArrayList<String> lines = getList();
     
@@ -29,18 +42,5 @@ public class DropScreen extends InventoryBasedScreen {
         terminal.write("What would you like to " + getVerb() + "?", 2, 23);
     
         terminal.repaint();
-    }
-
-	protected String getVerb() {
-        return "drop";
-    }
-
-	protected boolean isAcceptable(Item item) {
-        return true;
-    }
-
-	protected Screen use(Item item) {
-        player.drop(item);
-        return null;
     }
 }

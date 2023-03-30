@@ -21,9 +21,9 @@ public class PlayScreen implements Screen {
 	private FieldOfView fov;
 	private int screenWidth;
 	private int screenHeight;
-	
+
 	private Screen subscreen;
-	
+
 	private List<String> messages;
 
 	public void displayOutput(AsciiPanel terminal) {
@@ -36,60 +36,96 @@ public class PlayScreen implements Screen {
 
 		terminal.write(player.glyph(), player.x - left, player.y - top, player.color());
 
-		String stats = String.format(" %3d/%3d hp", player.hp(), player.maxHp());
+		String stats = String.format(" %3d/%3d hp %8s", player.hp(), player.maxHp(), hunger());
 		terminal.write(stats, 1, 21);
-		String level = String.format(" Floor: %3d", player.z+1);
+		String level = String.format(" Floor: %3d", player.z + 1);
 		terminal.write(level, 1, 22);
 		if (subscreen != null)
-		    subscreen.displayOutput(terminal);
-		
+			subscreen.displayOutput(terminal);
+
 	}
 
-	
+	private String hunger() {
+		if (player.food() < player.maxFood() * 0.1)
+			return "Starving";
+		else if (player.food() < player.maxFood() * 0.2)
+			return "Hungry";
+		else if (player.food() > player.maxFood() * 0.9)
+			return "Stuffed";
+		else if (player.food() > player.maxFood() * 0.8)
+			return "Full";
+		else
+			return "";
+	}
 
 	public Screen respondToUserInput(KeyEvent key) {
-	     if (subscreen != null) {
-	         subscreen = subscreen.respondToUserInput(key);
-	     } else {
-	         switch (key.getKeyCode()){
-	         case KeyEvent.VK_LEFT:
-	         case KeyEvent.VK_H: player.moveBy(-1, 0, 0); break;
-	         case KeyEvent.VK_RIGHT:
-	         case KeyEvent.VK_L: player.moveBy( 1, 0, 0); break;
-	         case KeyEvent.VK_UP:
-	         case KeyEvent.VK_K: player.moveBy( 0,-1, 0); break;
-	         case KeyEvent.VK_DOWN:
-	         case KeyEvent.VK_J: player.moveBy( 0, 1, 0); break;
-	         case KeyEvent.VK_Y: player.moveBy(-1,-1, 0); break;
-	         case KeyEvent.VK_U: player.moveBy( 1,-1, 0); break;
-	         case KeyEvent.VK_B: player.moveBy(-1, 1, 0); break;
-	         case KeyEvent.VK_N: player.moveBy( 1, 1, 0); break;
-	         case KeyEvent.VK_D: subscreen = new DropScreen(player); break;
-	         }
-	        
-	         switch (key.getKeyChar()){
-	         case 'g':
-	         case ',': player.pickup(); break;
-	         case '-':
-	             if (userIsTryingToExit())
-	              return userExits();
-	             else
-	              player.moveBy( 0, 0, -1); 
-	             break;
-	         case '+': player.moveBy( 0, 0, 1); break;
-	         }
-	     }
-	    
-	     if (subscreen == null)
-	         world.update();
-	    
-	     if (player.hp() < 1)
-	         return new LoseScreen();
-	    
-	     return this;
-	 }
-	
-	public PlayScreen(){
+		if (subscreen != null) {
+			subscreen = subscreen.respondToUserInput(key);
+		} else {
+			switch (key.getKeyCode()) {
+			case KeyEvent.VK_LEFT:
+			case KeyEvent.VK_H:
+				player.moveBy(-1, 0, 0);
+				break;
+			case KeyEvent.VK_RIGHT:
+			case KeyEvent.VK_L:
+				player.moveBy(1, 0, 0);
+				break;
+			case KeyEvent.VK_UP:
+			case KeyEvent.VK_K:
+				player.moveBy(0, -1, 0);
+				break;
+			case KeyEvent.VK_DOWN:
+			case KeyEvent.VK_J:
+				player.moveBy(0, 1, 0);
+				break;
+			case KeyEvent.VK_Y:
+				player.moveBy(-1, -1, 0);
+				break;
+			case KeyEvent.VK_U:
+				player.moveBy(1, -1, 0);
+				break;
+			case KeyEvent.VK_B:
+				player.moveBy(-1, 1, 0);
+				break;
+			case KeyEvent.VK_N:
+				player.moveBy(1, 1, 0);
+				break;
+			case KeyEvent.VK_D:
+				subscreen = new DropScreen(player);
+				break;
+			case KeyEvent.VK_E:
+				subscreen = new EatScreen(player);
+				break;
+			}
+
+			switch (key.getKeyChar()) {
+			case 'g':
+			case ',':
+				player.pickup();
+				break;
+			case '-':
+				if (userIsTryingToExit())
+					return userExits();
+				else
+					player.moveBy(0, 0, -1);
+				break;
+			case '+':
+				player.moveBy(0, 0, 1);
+				break;
+			}
+		}
+
+		if (subscreen == null)
+			world.update();
+
+		if (player.hp() < 1)
+			return new LoseScreen();
+
+		return this;
+	}
+
+	public PlayScreen() {
 		screenWidth = 80;
 		screenHeight = 21;
 		messages = new ArrayList<String>();
@@ -111,7 +147,7 @@ public class PlayScreen implements Screen {
 	public int getPlayerY() {
 		return Math.max(0, Math.min(player.y - screenHeight / 2, world.height() - screenHeight));
 	}
-		
+
 	private void displayMessages(AsciiPanel terminal, List<String> messages) {
 		int top = screenHeight - messages.size();
 		for (int i = 0; i < messages.size(); i++) {
@@ -119,55 +155,54 @@ public class PlayScreen implements Screen {
 		}
 		messages.clear();
 	}
-	
+
 	private void displayTiles(AsciiPanel terminal, int left, int top) {
-	    fov.update(player.x, player.y, player.z, player.visionRadius());
-	    
-	    for (int x = 0; x < screenWidth; x++){
-	        for (int y = 0; y < screenHeight; y++){
-	            int wx = x + left;
-	            int wy = y + top;
+		fov.update(player.x, player.y, player.z, player.visionRadius());
 
-	            if (player.canSee(wx, wy, player.z))
-	                terminal.write(world.glyph(wx, wy, player.z), x, y, world.color(wx, wy, player.z));
-	            else
-	                terminal.write(fov.tile(wx, wy, player.z).glyph(), x, y, Color.darkGray);
-	        }
-	    }
-	}
-	
+		for (int x = 0; x < screenWidth; x++) {
+			for (int y = 0; y < screenHeight; y++) {
+				int wx = x + left;
+				int wy = y + top;
 
-	private void createCreatures(EntityFactory creatureFactory){
-	    player = creatureFactory.newPlayer(messages);
-	    
-	    for (int i = 0; i < 8; i++){
-        creatureFactory.newFungus();
-	    }
-	    
-	    for (int i = 0; i < 20; i++){
-	        creatureFactory.newBat();
-	    }
+				if (player.canSee(wx, wy, player.z))
+					terminal.write(world.glyph(wx, wy, player.z), x, y, world.color(wx, wy, player.z));
+				else
+					terminal.write(fov.tile(wx, wy, player.z).glyph(), x, y, Color.darkGray);
+			}
+		}
 	}
-	
+
+	private void createCreatures(EntityFactory creatureFactory) {
+		player = creatureFactory.newPlayer(messages);
+
+		for (int i = 0; i < 8; i++) {
+			creatureFactory.newFungus();
+		}
+
+		for (int i = 0; i < 20; i++) {
+			creatureFactory.newBat();
+		}
+	}
+
 	private void createItems(EntityFactory factory) {
-	    for (int z = 0; z < world.depth(); z++){
-	        for (int i = 0; i < world.width() * world.height() / 20; i++){
-	            factory.newRock(z);
-	        }
-	    }
-	    factory.newVictoryItem(world.depth() - 1);
-	}
-	
-	private boolean userIsTryingToExit(){
-	    return player.z == 0 && world.tile(player.x, player.y, player.z) == Tile.STAIRS_UP;
+		for (int z = 0; z < world.depth(); z++) {
+			for (int i = 0; i < world.width() * world.height() / 20; i++) {
+				factory.newRock(z);
+			}
+		}
+		factory.newVictoryItem(world.depth() - 1);
 	}
 
-	private Screen userExits(){
-	    for (Item item : player.inventory().getItems()){
-	        if (item != null && item.name().equals("teddy bear"))
-	            return new WinScreen();
-	    }
-	    return new LoseScreen();
+	private boolean userIsTryingToExit() {
+		return player.z == 0 && world.tile(player.x, player.y, player.z) == Tile.STAIRS_UP;
+	}
+
+	private Screen userExits() {
+		for (Item item : player.inventory().getItems()) {
+			if (item != null && item.name().equals("teddy bear"))
+				return new WinScreen();
+		}
+		return new LoseScreen();
 	}
 
 }

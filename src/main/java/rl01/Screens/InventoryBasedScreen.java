@@ -20,7 +20,7 @@ public abstract class InventoryBasedScreen implements Screen {
         this.letters = "abcdefghijklmnopqrstuvwxyz";
     }
     
-    private ArrayList<String> getList() {
+   public ArrayList<String> getList() {
         ArrayList<String> lines = new ArrayList<String>();
         Item[] inventory = player.inventory().getItems();
     
@@ -51,5 +51,7 @@ public abstract class InventoryBasedScreen implements Screen {
             return null;
         else
             return this;
-    }   
+    } 
+    
+    
 }

@@ -94,10 +94,14 @@ public class Creature {
 		this.visionRadius = visionRadius;
 		this.name = name;
 		this.inventory = new Inventory(20);
+		this.maxFood = 1000;
+		this.food = maxFood / 3 * 2;
 	}
 
 	public void dig(int wx, int wy, int wz) {
-		world.dig(wx, wy, wz);
+	    modifyFood(-10);
+	    world.dig(wx, wy, wz);
+	    doAction("dig");
 	}
 
 	public void attack(Creature other) {
@@ -111,18 +115,26 @@ public class Creature {
 
 	public void modifyHp(int amount) {
 		hp += amount;
-
-		if (hp < 1)
+		if (hp < 1) {
 			doAction("die");
-		world.remove(this);
+			leaveCorpse();
+			world.remove(this);
+		}
+	}
+
+	private void leaveCorpse() {
+		Item corpse = new Item('%', color, name + " corpse");
+		corpse.modifyFoodValue(maxHp * 3);
+		world.addAtEmptySpace(corpse, x, y, z);
 	}
 
 	public boolean canEnter(int wx, int wy, int wz) {
 		return world.tile(wx, wy, wz).isGround() && world.creature(wx, wy, wz) == null;
 	}
 
-	public void update() {
-		ai.onUpdate();
+	public void update(){
+	    modifyFood(-1);
+	    ai.onUpdate();
 	}
 
 	public void moveBy(int mx, int my, int mz) {
@@ -219,5 +231,32 @@ public class Creature {
 	public Creature creature(int wx, int wy, int wz) {
 		return world.creature(wx, wy, wz);
 	}
+	
+	private int maxFood;
+	public int maxFood() { return maxFood; }
 
+	private int food;
+	public int food() { return food; }
+
+	public void modifyFood(int amount) {
+	    food += amount;
+
+	    if (food > maxFood) {
+	        maxFood = maxFood + food / 2;
+	        food = maxFood;
+	        notify("You can't believe your stomach can hold that much!");
+	        modifyHp(-1);
+	    } else if (food < 1 && isPlayer()) {
+	        modifyHp(-1000);
+	    }
+	}
+
+	public boolean isPlayer(){
+	    return glyph == '@';
+	}
+
+	public void eat(Item item){
+	    modifyFood(item.foodValue());
+	    inventory.remove(item);
+	}
 }
