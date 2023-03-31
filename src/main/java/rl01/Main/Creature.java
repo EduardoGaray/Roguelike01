@@ -198,7 +198,7 @@ public class Creature {
 				if (other == null)
 					continue;
 
-				if (other == this)
+				if (other.tag.equals("player"))
 					other.notify("You " + message + ".", params);
 				else if (other.canSee(x, y, z))
 					other.notify(String.format("The %s %s.", other.name, makeSecondPerson(message)), params);					
