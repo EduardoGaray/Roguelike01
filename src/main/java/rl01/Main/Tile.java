@@ -5,8 +5,12 @@ import asciiPanel.AsciiPanel;
 
 public enum Tile {
 
-	FLOOR((char) 250, AsciiPanel.yellow, false), WALL((char) 177, AsciiPanel.yellow, true), BOUNDS('x', AsciiPanel.brightBlack, true),
-	STAIRS_DOWN('>', AsciiPanel.white, false),STAIRS_UP('<', AsciiPanel.white, false), UNKNOWN(' ', AsciiPanel.white, false);
+	FLOOR((char)250, AsciiPanel.yellow, "A dirt and rock cave floor."),
+    WALL((char)177, AsciiPanel.yellow, "A dirt and rock cave wall."),
+    BOUNDS('x', AsciiPanel.brightBlack, "Beyond the edge of the world."),
+    STAIRS_DOWN('>', AsciiPanel.white, "A stone staircase that goes down."),
+    STAIRS_UP('<', AsciiPanel.white, "A stone staircase that goes up."),
+    UNKNOWN(' ', AsciiPanel.white, "(unknown)");
 
 	private char glyph;
 
@@ -20,16 +24,14 @@ public enum Tile {
 		return color;
 	}
 
-	Tile(char glyph, Color color, boolean impassable) {
-		this.glyph = glyph;
-		this.color = color;
-		this.impassable = impassable;
-	}
-	
-	private boolean impassable;
-	public boolean impassable() {
-		return impassable;
-	}
+	private String details;
+    public String details(){ return details; }
+
+    Tile(char glyph, Color color, String details){
+        this.glyph = glyph;
+        this.color = color;
+        this. details = details;
+    }
 	
 	public boolean isDiggable() {
 	    return this == Tile.WALL;

@@ -10,6 +10,7 @@ import rl01.Main.Creature;
 import rl01.Main.EntityFactory;
 import rl01.Main.FieldOfView;
 import rl01.Main.Item;
+import rl01.Main.PlayerAi;
 import rl01.Main.Tile;
 import rl01.Main.World;
 import rl01.Main.WorldBuilder;
@@ -67,11 +68,9 @@ public class PlayScreen implements Screen {
 		} else {
 			switch (key.getKeyCode()) {
 			case KeyEvent.VK_LEFT:
-			case KeyEvent.VK_H:
 				player.moveBy(-1, 0, 0);
 				break;
 			case KeyEvent.VK_RIGHT:
-			case KeyEvent.VK_L:
 				player.moveBy(1, 0, 0);
 				break;
 			case KeyEvent.VK_UP:
@@ -102,6 +101,12 @@ public class PlayScreen implements Screen {
 				break;
 			case KeyEvent.VK_W:
 				subscreen = new EquipScreen(player);
+				break;
+			case KeyEvent.VK_H:
+				subscreen = new HelpScreen();
+				break;
+			case KeyEvent.VK_L:
+				subscreen = new LookScreen(player, "Look Around", player.x, player.y);
 				break;
 			case KeyEvent.VK_G:
 				player.pickup();
@@ -175,17 +180,17 @@ public class PlayScreen implements Screen {
 	}
 
 	private void createCreatures(EntityFactory creatureFactory) {
-		player = creatureFactory.newPlayer(messages);
+		player = creatureFactory.newPlayer(messages, fov);
 
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 1; i++) {
 			creatureFactory.newFungus(messages);
 		}
 
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 1; i++) {
 			creatureFactory.newBat(messages);
 		}
 		
-		for (int i = 0; i < 5; i++){
+		for (int i = 0; i < 1; i++){
 			creatureFactory.newZombie(player, messages);
 	     }
 	}

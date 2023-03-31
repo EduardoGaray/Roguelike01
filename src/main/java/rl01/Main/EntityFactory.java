@@ -12,11 +12,11 @@ public class EntityFactory {
 		this.world = world;
 	}
 
-	public Creature newPlayer(List<String> messages) {
+	public Creature newPlayer(List<String> messages, FieldOfView fov) {
 		Creature player = new Creature(world, '@', AsciiPanel.brightWhite, 100, 20, 5, "player", 9, "Player");
 		world.addAtEmptyLocation(player, 0);
 		System.out.println("Spawning player on level: 0");
-		new PlayerAi(player, messages);
+		new PlayerAi(player, world, messages, fov);
 		return player;
 	}
 
