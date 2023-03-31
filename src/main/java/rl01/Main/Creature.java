@@ -2,6 +2,7 @@ package rl01.Main;
 
 import java.awt.Color;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Creature {
 
@@ -90,6 +91,12 @@ public class Creature {
 		return visionRadius;
 	}
 
+	private List<Effect> effects;
+
+	public List<Effect> effects() {
+		return effects;
+	}
+
 	private String name;
 
 	public String name() {
@@ -102,13 +109,13 @@ public class Creature {
 		return inventory;
 	}
 
-	public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense, String tag,
-			int visionRadius, String name) {
+	public Creature(World world, char glyph, Color color, int maxHp, int hp, int attack, int defense, String tag,
+			int visionRadius, String name, List<Effect> effects) {
 		this.world = world;
 		this.glyph = glyph;
 		this.color = color;
 		this.maxHp = maxHp;
-		this.hp = maxHp;
+		this.hp = hp;
 		this.attackValue = attack;
 		this.defenseValue = defense;
 		this.tag = tag;
@@ -118,23 +125,13 @@ public class Creature {
 		this.maxFood = 1000;
 		this.food = maxFood / 3 * 2;
 		this.level = 1;
+		this.effects = new ArrayList<Effect>();
 	}
 
 	public void dig(int wx, int wy, int wz) {
 		modifyFood(-10);
 		world.dig(wx, wy, wz);
 		doAction("dig");
-	}
-
-	public void attack(Creature other) {
-		int amount = Math.max(0, attackValue() - other.defenseValue());
-
-		amount = (int) (Math.random() * amount) + 1;
-		doAction("attack the '%s' for %d damage", other.name, amount);
-		other.modifyHp(-amount);
-		if (other.hp < 1)
-			gainXp(other);
-
 	}
 
 	public void modifyHp(int amount) {
@@ -146,10 +143,30 @@ public class Creature {
 		}
 	}
 
+	private int regenHpCooldown;
+	private int regenHpPer1000;
+
+	public void modifyRegenHpPer1000(int amount) {
+		regenHpPer1000 += amount;
+	}
+
+	private void regenerateHealth() {
+		regenHpCooldown -= regenHpPer1000;
+		if (regenHpCooldown < 0) {
+			modifyHp(1);
+			modifyFood(-1);
+			regenHpCooldown += 1000;
+		}
+	}
+
 	private void leaveCorpse() {
 		Item corpse = new Item('%', color, name + " corpse");
-		corpse.modifyFoodValue(maxHp * 3);
+		corpse.modifyFoodValue(maxHp);
 		world.addAtEmptySpace(corpse, x, y, z);
+		for (Item item : inventory.getItems()) {
+			if (item != null)
+				drop(item);
+		}
 	}
 
 	public boolean canEnter(int wx, int wy, int wz) {
@@ -158,10 +175,12 @@ public class Creature {
 
 	public void update() {
 		modifyFood(-1);
+		regenerateHealth();
+		updateEffects();
 		ai.onUpdate();
 	}
 
-	public void moveBy(int mx, int my, int mz) {
+	public void moveBy(Creature creature, int mx, int my, int mz) {
 		Tile tile = world.tile(x + mx, y + my, z + mz);
 		if (mx == 0 && my == 0 && mz == 0)
 			return;
@@ -183,10 +202,12 @@ public class Creature {
 
 		Creature other = world.creature(x + mx, y + my, z + mz);
 
-		if (other == null || other.tag.equals("player")) {
+		if (other == null || other.tag.equals(creature.tag)) {
 			ai.onEnter(x + mx, y + my, z + mz, tile);
 		} else {
-			attack(other);
+
+			meleeAttack(other);
+
 		}
 	}
 
@@ -297,15 +318,6 @@ public class Creature {
 		return glyph == '@';
 	}
 
-	public void eat(Item item) {
-		if (item.foodValue() < 0)
-			notify("Gross!");
-
-		modifyFood(item.foodValue());
-		inventory.remove(item);
-		unequip(item);
-	}
-
 	private Item weapon;
 
 	public Item weapon() {
@@ -332,10 +344,20 @@ public class Creature {
 	}
 
 	public void equip(Item item) {
-		if (item.attackValue() == 0 && item.defenseValue() == 0)
+		if (!inventory.contains(item)) {
+			if (inventory.isFull()) {
+				notify("Can't equip %s since you're holding too much stuff.", item.name());
+				return;
+			} else {
+				world.remove(item);
+				inventory.add(item);
+			}
+		}
+
+		if (item.attackValue() == 0 && item.rangedAttackValue() == 0 && item.defenseValue() == 0)
 			return;
 
-		if (item.attackValue() >= item.defenseValue()) {
+		if (item.attackValue() + item.rangedAttackValue() >= item.defenseValue()) {
 			unequip(weapon);
 			doAction("wield a " + item.name());
 			weapon = item;
@@ -369,8 +391,7 @@ public class Creature {
 	public void gainMaxHp() {
 		maxHp += 10;
 		hp += 10;
-		if (hp > maxHp)
-		{
+		if (hp > maxHp) {
 			hp = maxHp;
 		}
 		doAction("look healthier");
@@ -401,6 +422,144 @@ public class Creature {
 			return world.item(wx, wy, wz);
 		else
 			return null;
+	}
+
+	public void throwItem(Item item, int wx, int wy, int wz) {
+		Point end = new Point(x, y, 0);
+
+		for (Point p : new Line(x, y, wx, wy)) {
+			if (!realTile(p.x, p.y, z).isGround())
+				break;
+			end = p;
+		}
+
+		wx = end.x;
+		wy = end.y;
+
+		Creature c = creature(wx, wy, wz);
+
+		if (c != null)
+			throwAttack(item, c);
+		else
+			doAction("throw a %s", item.name());
+
+		unequip(item);
+		inventory.remove(item);
+		world.addAtEmptySpace(item, wx, wy, wz);
+	}
+
+	private void throwAttack(Item item, Creature other) {
+		modifyFood(-1);
+
+		int amount = Math.max(0, attackValue / 2 + item.thrownAttackValue() - other.defenseValue());
+
+		amount = (int) (Math.random() * amount) + 1;
+
+		doAction("throw a %s at the %s for %d damage", item.name(), other.name, amount);
+
+		 commonAttack(other, attackValue / 2 + item.thrownAttackValue(), "throw a %s at the %s for %d damage", item.name(), other.name);
+		 other.addEffect(item.quaffEffect());
+
+		if (other.hp < 1)
+			gainXp(other);
+	}
+
+	public void rangedWeaponAttack(Creature other) {
+		modifyFood(-1);
+
+		int amount = Math.max(0, attackValue / 2 + weapon.rangedAttackValue() - other.defenseValue());
+
+		amount = (int) (Math.random() * amount) + 1;
+
+		doAction("fire a %s at the %s for %d damage", weapon.name(), other.name, amount);
+
+		other.modifyHp(-amount);
+
+		if (other.hp < 1)
+			gainXp(other);
+	}
+
+	private void commonAttack(Creature other, int attack, String action, Object... params) {
+		modifyFood(-2);
+
+		int amount = Math.max(0, attack - other.defenseValue());
+
+		amount = (int) (Math.random() * amount) + 1;
+
+		Object[] params2 = new Object[params.length + 1];
+		for (int i = 0; i < params.length; i++) {
+			params2[i] = params[i];
+		}
+		params2[params2.length - 1] = amount;
+
+		doAction(action, params2);
+
+		other.modifyHp(-amount);
+
+		if (other.hp < 1)
+			gainXp(other);
+	}
+
+	public void meleeAttack(Creature other) {
+		commonAttack(other, attackValue(), "attack the %s for %d damage", other.name);
+	}
+
+	private void getRidOf(Item item) {
+		inventory.remove(item);
+		unequip(item);
+	}
+
+	private void putAt(Item item, int wx, int wy, int wz) {
+		inventory.remove(item);
+		unequip(item);
+		world.addAtEmptySpace(item, wx, wy, wz);
+	}
+
+	public void quaff(Item item) {
+		doAction("quaff a " + item.name());
+		consume(item);
+	}
+
+	public void eat(Item item) {
+		doAction("eat a " + item.name());
+		consume(item);
+	}
+
+	private void consume(Item item) {
+		if (item.foodValue() < 0)
+			notify("Gross!");
+
+		addEffect(item.quaffEffect());
+
+		modifyFood(item.foodValue());
+		getRidOf(item);
+	}
+
+	private void addEffect(Effect effect) {
+		if (effect == null)
+			return;
+
+		effect.start(this);
+		effects.add(effect);
+	}
+
+	private void updateEffects() {
+		List<Effect> done = new ArrayList<Effect>();
+
+		for (Effect effect : effects) {
+			effect.update(this);
+			if (effect.isDone()) {
+				effect.end(this);
+				done.add(effect);
+			}
+		}
+
+		effects.removeAll(done);
+	}
+
+	public void buffAttackValue(int i) {
+		attackValue = attackValue + i;
+
 	}
 
 }
