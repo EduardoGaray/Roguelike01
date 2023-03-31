@@ -3,11 +3,14 @@ package rl01.Main;
 import java.util.List;
 
 public class ZombieAi extends CreatureAi {
+	
 	private Creature player;
+	 private List<String> messages;
 
-	public ZombieAi(Creature creature, Creature player) {
+	public ZombieAi(Creature creature, Creature player, List<String> messages) {
 		super(creature);
 		this.player = player;
+		this.messages = messages;
 	}
 
 	public void onUpdate() {
@@ -27,6 +30,10 @@ public class ZombieAi extends CreatureAi {
 		int my = points.get(0).y - creature.y;
 
 		creature.moveBy(mx, my, 0);
+	}
+	
+	public void onNotify(String message) {
+		messages.add(message);
 	}
 
 }

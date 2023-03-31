@@ -20,30 +20,30 @@ public class EntityFactory {
 		return player;
 	}
 
-	public Creature newFungus() {
+	public Creature newFungus(List<String> messages) {
 		Creature fungus = new Creature(world, 'f', AsciiPanel.green, 10, 0, 0, "creature", 9, "Fungi");
 		Random rand = new Random();
 		int randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(fungus, randomDepth);
-		new FungusAi(fungus, this);
+		new FungusAi(fungus, this, messages);
 		return fungus;
 	}
 
-	public Creature newBat() {
+	public Creature newBat(List<String> messages) {
 		Creature bat = new Creature(world, 'b', AsciiPanel.yellow, 15, 5, 0, "creature", 9, "Cave Bat");
 		Random rand = new Random();
 		int randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(bat, randomDepth);
-		new BatAi(bat);
+		new BatAi(bat, messages);
 		return bat;
 	}
 	
-	public Creature newZombie(Creature player){
+	public Creature newZombie(Creature player, List<String> messages){
 	      Creature zombie = new Creature(world, 'z', AsciiPanel.white,50, 10, 10, "creature", 9, "Zombie");
 	      Random rand = new Random();
 		  int randomDepth = rand.nextInt(world.depth());
 	      world.addAtEmptyLocation(zombie,randomDepth);
-	      new ZombieAi(zombie, player);
+	      new ZombieAi(zombie, player, messages);
 	      return zombie;
 	  }
 

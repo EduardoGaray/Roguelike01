@@ -1,12 +1,15 @@
 package rl01.Main;
 
 import java.awt.Color;
+import java.util.List;
 
 public class Creature {
 
 	private World world;
 	private FieldOfView fov;
 
+	private List<String> messages;
+	
 	public int x;
 	public int y;
 	public int z;

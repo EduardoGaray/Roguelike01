@@ -1,13 +1,18 @@
 package rl01.Main;
 
+import java.util.List;
+
 public class FungusAi extends CreatureAi {
 	
 	 private EntityFactory factory;
 	 private int spreadcount;
 	 
-    public FungusAi(Creature creature, EntityFactory factory) {
+	 private List<String> messages;
+	 
+    public FungusAi(Creature creature, EntityFactory factory, List<String> messages) {
     	 super(creature);
          this.factory = factory;
+         this.messages = messages;
     }
     
     public void onUpdate(){
@@ -23,11 +28,15 @@ public class FungusAi extends CreatureAi {
         if (!creature.canEnter(x, y, z))
             return;
   
-        Creature child = factory.newFungus();
+        Creature child = factory.newFungus(messages);
         child.x = x;
         child.y = y;
         child.z = z;
         spreadcount++;
         creature.doAction("spawn a child");
-    }   
+    } 
+    
+    public void onNotify(String message) {
+		messages.add(message);
+	}
 }

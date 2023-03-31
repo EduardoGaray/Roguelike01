@@ -100,20 +100,16 @@ public class PlayScreen implements Screen {
 			case KeyEvent.VK_W:
 				subscreen = new EquipScreen(player);
 				break;
-			}
-
-			switch (key.getKeyChar()) {
-			case 'g':
-			case ',':
+			case KeyEvent.VK_G:
 				player.pickup();
 				break;
-			case '-':
+			case KeyEvent.VK_SUBTRACT:
 				if (userIsTryingToExit())
 					return userExits();
 				else
 					player.moveBy(0, 0, -1);
 				break;
-			case '+':
+			case KeyEvent.VK_ADD:
 				player.moveBy(0, 0, 1);
 				break;
 			}
@@ -179,15 +175,15 @@ public class PlayScreen implements Screen {
 		player = creatureFactory.newPlayer(messages);
 
 		for (int i = 0; i < 8; i++) {
-			creatureFactory.newFungus();
+			creatureFactory.newFungus(messages);
 		}
 
 		for (int i = 0; i < 20; i++) {
-			creatureFactory.newBat();
+			creatureFactory.newBat(messages);
 		}
 		
 		for (int i = 0; i < 5; i++){
-			creatureFactory.newZombie(player);
+			creatureFactory.newZombie(player, messages);
 	     }
 	}
 
