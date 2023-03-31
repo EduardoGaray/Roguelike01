@@ -1,5 +1,7 @@
 package rl01.Screens;
 
+import java.util.ArrayList;
+
 import asciiPanel.AsciiPanel;
 import rl01.Main.Creature;
 import rl01.Main.Item;
@@ -24,10 +26,23 @@ public class ExamineScreen extends InventoryBasedScreen {
         return null;
     }
 
-	@Override
-	public void displayOutput(AsciiPanel terminal) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void displayOutput(AsciiPanel terminal) {
+        ArrayList<String> lines = getList();
+    
+        int y = 23 - lines.size();
+        int x = 4;
+
+        if (lines.size() > 0)
+            terminal.clear(' ', x, y, 20, lines.size());
+    
+        for (String line : lines){
+            terminal.write(line, x, y++);
+        }
+    
+        terminal.clear(' ', 0, 23, 80, 1);
+        terminal.write("What would you like to " + getVerb() + "?", 2, 23);
+    
+        terminal.repaint();
+    }
 }
 

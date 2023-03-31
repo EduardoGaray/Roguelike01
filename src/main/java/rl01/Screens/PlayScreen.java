@@ -62,7 +62,7 @@ public class PlayScreen implements Screen {
 	public Screen respondToUserInput(KeyEvent key) {
 		int level = player.level();
 		if (player.level() > level)
-		      subscreen = new LevelUpScreen(player, player.level() - level);
+			subscreen = new LevelUpScreen(player, player.level() - level);
 		if (subscreen != null) {
 			subscreen = subscreen.respondToUserInput(key);
 		} else {
@@ -104,6 +104,9 @@ public class PlayScreen implements Screen {
 				break;
 			case KeyEvent.VK_H:
 				subscreen = new HelpScreen();
+				break;
+			case KeyEvent.VK_X:
+				subscreen = new ExamineScreen(player);
 				break;
 			case KeyEvent.VK_L:
 				subscreen = new LookScreen(player, "Look Around", player.x, player.y);
@@ -182,17 +185,17 @@ public class PlayScreen implements Screen {
 	private void createCreatures(EntityFactory creatureFactory) {
 		player = creatureFactory.newPlayer(messages, fov);
 
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 10; i++) {
 			creatureFactory.newFungus(messages);
 		}
 
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 20; i++) {
 			creatureFactory.newBat(messages);
 		}
-		
-		for (int i = 0; i < 1; i++){
+
+		for (int i = 0; i < 5; i++) {
 			creatureFactory.newZombie(player, messages);
-	     }
+		}
 	}
 
 	private void createItems(EntityFactory factory) {

@@ -369,6 +369,10 @@ public class Creature {
 	public void gainMaxHp() {
 		maxHp += 10;
 		hp += 10;
+		if (hp > maxHp)
+		{
+			hp = maxHp;
+		}
 		doAction("look healthier");
 	}
 
