@@ -17,7 +17,7 @@ public class PlayerAi extends CreatureAi {
     }
 
 	public void onEnter(int x, int y, int z, Tile tile){
-        if (tile.isGround() && creature.canEnter(x, y, z)){
+        if (tile.isGround()){
          creature.x = x;
          creature.y = y;
          creature.z = z;

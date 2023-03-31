@@ -183,7 +183,7 @@ public class Creature {
 
 		Creature other = world.creature(x + mx, y + my, z + mz);
 
-		if (other == null) {
+		if (other == null || other.tag.equals("player")) {
 			ai.onEnter(x + mx, y + my, z + mz, tile);
 		} else {
 			attack(other);

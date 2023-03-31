@@ -114,13 +114,13 @@ public class PlayScreen implements Screen {
 			case KeyEvent.VK_G:
 				player.pickup();
 				break;
-			case KeyEvent.VK_SUBTRACT:
+			case KeyEvent.VK_0:
 				if (userIsTryingToExit())
 					return userExits();
 				else
 					player.moveBy(0, 0, -1);
 				break;
-			case KeyEvent.VK_ADD:
+			case KeyEvent.VK_1:
 				player.moveBy(0, 0, 1);
 				break;
 			}
