@@ -7,14 +7,18 @@ public class Creature {
 
 	private World world;
 	private FieldOfView fov;
-
-	private List<String> messages;
 	
 	public int x;
 	public int y;
 	public int z;
 
 	public String tag;
+	
+	private int xp;
+	public int xp() { return xp; }
+	
+	private int level;
+	public int level() { return level; }
 
 	private char glyph;
 
@@ -109,6 +113,7 @@ public class Creature {
 		this.inventory = new Inventory(20);
 		this.maxFood = 1000;
 		this.food = maxFood / 3 * 2;
+		this.level = 1;
 	}
 
 	public void dig(int wx, int wy, int wz) {
@@ -123,6 +128,8 @@ public class Creature {
 		amount = (int) (Math.random() * amount) + 1;
 		doAction("attack the '%s' for %d damage", other.name, amount);
 		other.modifyHp(-amount);
+		if (other.hp < 1)
+		gainXp(other);
 
 	}
 
@@ -222,7 +229,7 @@ public class Creature {
 	public boolean canSee(int wx, int wy, int wz) {
 		return ai.canSee(wx, wy, wz);
 	}
-
+	
 	public void pickup() {
 		Item item = world.item(x, y, z);
 
@@ -312,5 +319,49 @@ public class Creature {
 	          doAction("put on a " + item.name());
 	          armor = item;
 	      }
+	  }
+	
+	public void modifyXp(int amount) {
+	      xp += amount;
+
+	      notify("You %s %d xp.", amount < 0 ? "lose" : "gain", amount);
+
+	      while (xp > (int)(Math.pow(level, 1.5) * 20)) {
+	          level++;
+	          doAction("advance to level %d", level);
+	          ai.onGainLevel();
+	          modifyHp(level * 2);
+	      }
+	  }
+	
+	public void gainXp(Creature other){
+	    int amount = other.maxHp
+	      + other.attackValue()
+	      + other.defenseValue()
+	      - level * 2;
+
+	    if (amount > 0)
+	      modifyXp(amount);
+	  }
+	
+	public void gainMaxHp() {
+	    maxHp += 10;
+	    hp += 10;
+	    doAction("look healthier");
+	  }
+
+	  public void gainAttackValue() {
+	    attackValue += 2;
+	    doAction("look stronger");
+	  }
+
+	  public void gainDefenseValue() {
+	    defenseValue += 2;
+	    doAction("look tougher");
+	  }
+
+	  public void gainVision() {
+	    visionRadius += 1;
+	    doAction("look more aware");
 	  }
 }

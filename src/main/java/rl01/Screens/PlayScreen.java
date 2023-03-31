@@ -59,6 +59,9 @@ public class PlayScreen implements Screen {
 	}
 
 	public Screen respondToUserInput(KeyEvent key) {
+		int level = player.level();
+		if (player.level() > level)
+		      subscreen = new LevelUpScreen(player, player.level() - level);
 		if (subscreen != null) {
 			subscreen = subscreen.respondToUserInput(key);
 		} else {
