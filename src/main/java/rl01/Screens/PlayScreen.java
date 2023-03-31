@@ -60,6 +60,8 @@ public class PlayScreen implements Screen {
 	}
 
 	public Screen respondToUserInput(KeyEvent key) {
+		int left = getPlayerX();
+		int top = getPlayerY();
 		int level = player.level();
 		if (player.level() > level)
 			subscreen = new LevelUpScreen(player, player.level() - level);
@@ -74,11 +76,9 @@ public class PlayScreen implements Screen {
 				player.moveBy(1, 0, 0);
 				break;
 			case KeyEvent.VK_UP:
-			case KeyEvent.VK_K:
 				player.moveBy(0, -1, 0);
 				break;
 			case KeyEvent.VK_DOWN:
-			case KeyEvent.VK_J:
 				player.moveBy(0, 1, 0);
 				break;
 			case KeyEvent.VK_Y:
@@ -109,7 +109,7 @@ public class PlayScreen implements Screen {
 				subscreen = new ExamineScreen(player);
 				break;
 			case KeyEvent.VK_L:
-				subscreen = new LookScreen(player, "Look Around", player.x, player.y);
+				subscreen = new LookScreen(player, "Look Around", player.x - left, player.y - top );
 				break;
 			case KeyEvent.VK_G:
 				player.pickup();
@@ -168,7 +168,8 @@ public class PlayScreen implements Screen {
 
 	private void displayTiles(AsciiPanel terminal, int left, int top) {
 		fov.update(player.x, player.y, player.z, player.visionRadius());
-
+		 System.out.println("Player x: "+player.x);
+		 System.out.println("Player y: "+player.y);
 		for (int x = 0; x < screenWidth; x++) {
 			for (int y = 0; y < screenHeight; y++) {
 				int wx = x + left;
