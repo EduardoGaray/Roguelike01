@@ -14,7 +14,7 @@ public class CreatureAi {
 	         creature.y = y;
 	         creature.z = z;
 	    } else {
-	         //creature.doAction("bump into a wall");
+	         creature.doAction("bump into a wall");
 	    }
 	}
 	
@@ -27,7 +27,7 @@ public class CreatureAi {
 	    if (other != null && other.glyph() == creature.glyph() && !other.canEnter(creature.x + mx, creature.y + my, creature.z))
 	        return;
 	    else
-	        creature.moveBy(creature, mx, my, 0);
+	        creature.moveBy(mx, my, 0);
 	}
 
 	public void onUpdate() { }

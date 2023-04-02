@@ -36,8 +36,4 @@ public class Inventory {
         }
         return size == items.length;
     }
-	public boolean contains(Item item) {
-		
-		return false;
-	}
 }

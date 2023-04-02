@@ -37,22 +37,10 @@ public class Item {
 	public int attackValue() {
 		return attackValue;
 	}
-	
+
 	public void modifyAttackValue(int amount) {
 		attackValue += amount;
 	}
-	
-	private int thrownAttackValue;
-    public int thrownAttackValue() { return thrownAttackValue; }
-    public void modifyThrownAttackValue(int amount) { thrownAttackValue += amount; }
-    
-    private int rangedAttackValue;
-    public int rangedAttackValue() { return rangedAttackValue; }
-    public void modifyRangedAttackValue(int amount) { rangedAttackValue += amount; }
-    
-    private Effect quaffEffect;
-    public Effect quaffEffect() { return quaffEffect; }
-    public void setQuaffEffect(Effect effect) { this.quaffEffect = effect; }
 
 	private int defenseValue;
 
@@ -74,13 +62,10 @@ public class Item {
 		String details = "";
 
 		if (attackValue != 0)
-			details += "     melee:" + attackValue;
-		
-		if (thrownAttackValue != 0)
-			details += "     thrown:" + thrownAttackValue;
+			details += "     attack:" + attackValue;
 
 		if (defenseValue != 0)
-			details += "     armor:" + defenseValue;
+			details += "     defense:" + defenseValue;
 
 		if (foodValue != 0)
 			details += "     food:" + foodValue;
