@@ -39,8 +39,8 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	}
 
 	public void keyTyped(KeyEvent e) {
-		screen = screen.respondToUserInput(e);
-		repaint();
+//		screen = screen.respondToUserInput(e);
+//		repaint();
 	}
 
 	public static void main(String[] args) {
