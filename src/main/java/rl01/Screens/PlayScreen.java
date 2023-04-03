@@ -3,6 +3,7 @@ package rl01.Screens;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.Random;
 import java.util.ArrayList;
 
 import asciiPanel.AsciiPanel;
@@ -132,6 +133,9 @@ public class PlayScreen implements Screen {
 				else
 					subscreen = new FireWeaponScreen(player, player.x - left, player.y - top);
 				break;
+			case KeyEvent.VK_Q:
+				subscreen = new QuaffScreen(player);
+				break;
 			}
 		}
 
@@ -204,36 +208,66 @@ public class PlayScreen implements Screen {
 
 	private void createCreatures(EntityFactory creatureFactory) {
 		player = creatureFactory.newPlayer(messages, fov);
+		Random rand = new Random();
+		int randomDepth;
 
 		for (int i = 0; i < 10; i++) {
+			randomDepth = rand.nextInt(world.depth());
 			creatureFactory.newFungus();
 		}
 
 		for (int i = 0; i < 20; i++) {
+			randomDepth = rand.nextInt(world.depth());
 			creatureFactory.newBat();
 		}
 
 		for (int i = 0; i < 5; i++) {
+			randomDepth = rand.nextInt(world.depth());
 			creatureFactory.newZombie(player);
 		}
 
 		for (int i = 0; i < 3; i++) {
+			randomDepth = rand.nextInt(world.depth());
 			creatureFactory.newGoblin(player);
 		}
 	}
 
 	private void createItems(EntityFactory factory) {
+		
+		Random rand = new Random();
+		int randomDepth;
+		
 		for (int z = 0; z < world.depth(); z++) {
 			for (int i = 0; i < world.width() * world.height() / 20; i++) {
 				factory.newRock(z);
 			}
 		}
 
-		factory.newVictoryItem(world.depth() - 1);
-		factory.newEdibleWeapon(world.depth() - 1);
-		factory.randomArmor(world.depth() - 1);
-		factory.randomWeapon(world.depth() - 1);
-		factory.randomPotion(world.depth() - 1);
+		for (int i = 0; i < 1; i++) {
+			randomDepth = rand.nextInt(world.depth());
+			factory.newVictoryItem(world.depth()-1);
+		}
+		
+		for (int i = 0; i < 5; i++) {
+			randomDepth = rand.nextInt(world.depth());
+			factory.newEdibleWeapon(randomDepth);
+		}
+		
+		for (int i = 0; i < 3; i++) {
+			randomDepth = rand.nextInt(world.depth());
+			factory.randomArmor(randomDepth);
+		}
+		
+		for (int i = 0; i < 3; i++) {
+			randomDepth = rand.nextInt(world.depth());
+			factory.randomWeapon(randomDepth);
+		}
+		
+		for (int i = 0; i < 10; i++) {
+			randomDepth = rand.nextInt(world.depth());
+			factory.randomPotion(randomDepth);
+		}
+		
 	}
 
 	private boolean userIsTryingToExit() {

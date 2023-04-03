@@ -24,7 +24,7 @@ public class EntityFactory {
 
 	public Creature newFungus() {
 		List<Effect> effects = new ArrayList<Effect>();
-		Creature fungus = new Creature(world, 'f', AsciiPanel.green, 10, 10, 0, 0, "creature", 10, "Fungi", effects);
+		Creature fungus = new Creature(world, 'f', AsciiPanel.green, 10, 10, 0, 0, "creature", 1, "Fungi", effects);
 		Random rand = new Random();
 		int randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(fungus, randomDepth);
@@ -34,7 +34,7 @@ public class EntityFactory {
 
 	public Creature newBat() {
 		List<Effect> effects = new ArrayList<Effect>();
-		Creature bat = new Creature(world, 'b', AsciiPanel.yellow, 15, 15, 0, 0, "creature", 10, "Cave Bat", effects);
+		Creature bat = new Creature(world, 'b', AsciiPanel.yellow, 15, 15, 0, 0, "creature", 18, "Cave Bat", effects);
 		Random rand = new Random();
 		int randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(bat, randomDepth);
@@ -44,7 +44,7 @@ public class EntityFactory {
 
 	public Creature newZombie(Creature player) {
 		List<Effect> effects = new ArrayList<Effect>();
-		Creature zombie = new Creature(world, 'z', AsciiPanel.white, 50, 50, 10, 0, "creature", 10, "Zombie", effects);
+		Creature zombie = new Creature(world, 'z', AsciiPanel.white, 50, 50, 10, 0, "creature", 5, "Zombie", effects);
 		Random rand = new Random();
 		int randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(zombie, randomDepth);

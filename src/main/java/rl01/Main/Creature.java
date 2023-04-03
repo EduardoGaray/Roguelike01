@@ -212,7 +212,7 @@ public class Creature {
 	}
 
 	public void doAction(String message, Object... params) {
-		int r = 9;
+		int r = visionRadius;
 		for (int ox = -r; ox < r + 1; ox++) {
 			for (int oy = -r; oy < r + 1; oy++) {
 				if (ox * ox + oy * oy > r * r)
