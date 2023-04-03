@@ -70,28 +70,28 @@ public class PlayScreen implements Screen {
 		} else {
 			switch (key.getKeyCode()) {
 			case KeyEvent.VK_LEFT:
-				player.moveBy(player, -1, 0, 0);
+				player.moveBy(-1, 0, 0);
 				break;
 			case KeyEvent.VK_RIGHT:
-				player.moveBy(player, 1, 0, 0);
+				player.moveBy(1, 0, 0);
 				break;
 			case KeyEvent.VK_UP:
-				player.moveBy(player, 0, -1, 0);
+				player.moveBy(0, -1, 0);
 				break;
 			case KeyEvent.VK_DOWN:
-				player.moveBy(player, 0, 1, 0);
+				player.moveBy(0, 1, 0);
 				break;
 			case KeyEvent.VK_Y:
-				player.moveBy(player, -1, -1, 0);
+				player.moveBy(-1, -1, 0);
 				break;
 			case KeyEvent.VK_U:
-				player.moveBy(player, 1, -1, 0);
+				player.moveBy(1, -1, 0);
 				break;
 			case KeyEvent.VK_B:
-				player.moveBy(player, -1, 1, 0);
+				player.moveBy(-1, 1, 0);
 				break;
 			case KeyEvent.VK_N:
-				player.moveBy(player, 1, 1, 0);
+				player.moveBy(1, 1, 0);
 				break;
 			case KeyEvent.VK_D:
 				subscreen = new DropScreen(player);
@@ -105,14 +105,11 @@ public class PlayScreen implements Screen {
 			case KeyEvent.VK_H:
 				subscreen = new HelpScreen();
 				break;
-			case KeyEvent.VK_T:
-				subscreen = new ThrowScreen(player, player.x - left, player.y - top);
-				break;
 			case KeyEvent.VK_X:
 				subscreen = new ExamineScreen(player);
 				break;
 			case KeyEvent.VK_L:
-				subscreen = new LookScreen(player, "Look Around", player.x - left, player.y - top);
+				subscreen = new LookScreen(player, "Look Around", player.x - left, player.y - top );
 				break;
 			case KeyEvent.VK_G:
 				player.pickup();
@@ -121,24 +118,16 @@ public class PlayScreen implements Screen {
 				if (userIsTryingToExit())
 					return userExits();
 				else
-					player.moveBy(player, 0, 0, -1);
+					player.moveBy(0, 0, -1);
 				break;
 			case KeyEvent.VK_1:
-				player.moveBy(player, 0, 0, 1);
+				player.moveBy(0, 0, 1);
 				break;
-			case KeyEvent.VK_F:
-		        if (player.weapon() == null || player.weapon().rangedAttackValue() == 0)
-		         player.notify("You don't have a ranged weapon equiped.");
-		        else
-		         subscreen = new FireWeaponScreen(player,player.x - left,player.y - top); 
-		        break;
 			}
 		}
 
 		if (subscreen == null)
 			world.update();
-		System.out.println("Player x: " + player.maxHp());
-		System.out.println("Player y: " + player.hp());
 
 		if (player.hp() < 1)
 			return new LoseScreen();
@@ -179,6 +168,8 @@ public class PlayScreen implements Screen {
 
 	private void displayTiles(AsciiPanel terminal, int left, int top) {
 		fov.update(player.x, player.y, player.z, player.visionRadius());
+		 System.out.println("Player x: "+player.x);
+		 System.out.println("Player y: "+player.y);
 		for (int x = 0; x < screenWidth; x++) {
 			for (int y = 0; y < screenHeight; y++) {
 				int wx = x + left;
@@ -206,10 +197,6 @@ public class PlayScreen implements Screen {
 		for (int i = 0; i < 5; i++) {
 			creatureFactory.newZombie(player, messages);
 		}
-		
-		for (int i = 0; i < 3; i++) {
-			creatureFactory.newGoblin(player, messages);
-		}
 	}
 
 	private void createItems(EntityFactory factory) {
@@ -218,12 +205,10 @@ public class PlayScreen implements Screen {
 				factory.newRock(z);
 			}
 		}
-		
 		factory.newVictoryItem(world.depth() - 1);
 		factory.newEdibleWeapon(world.depth() - 1);
 		factory.randomArmor(world.depth() - 1);
 		factory.randomWeapon(world.depth() - 1);
-		factory.randomPotion(world.depth() - 1);
 	}
 
 	private boolean userIsTryingToExit() {
