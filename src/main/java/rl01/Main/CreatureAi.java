@@ -1,7 +1,5 @@
 package rl01.Main;
 
-import java.util.Map;
-
 public class CreatureAi {
 	protected Creature creature;
 
@@ -59,22 +57,6 @@ public class CreatureAi {
 
 	public Tile rememberedTile(int wx, int wy, int wz) {
         return Tile.UNKNOWN;
-    }
-	
-	private Map<String, String> itemNames;
-
-    public String getName(Item item){
-        String name = itemNames.get(item.name());
-        return name == null ? item.appearance() : name;
-    }
- 
-    public void setName(Item item, String name){
-        itemNames.put(item.name(), name);
-    }
-    
-    public void discussItemName(Item item, Creature other){
-        creature.doAction(item, "say \"%ss are %ss\"", item.appearance(), item.name());
-        other.learnName(item);
     }
 
 }
