@@ -29,7 +29,7 @@ public class ZombieAi extends CreatureAi {
 		int mx = points.get(0).x - creature.x;
 		int my = points.get(0).y - creature.y;
 
-		creature.moveBy(mx, my, 0);
+		creature.moveBy(creature,mx, my, 0);
 	}
 	
 	public void onNotify(String message) {
