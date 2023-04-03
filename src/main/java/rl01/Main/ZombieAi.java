@@ -5,10 +5,12 @@ import java.util.List;
 public class ZombieAi extends CreatureAi {
 	
 	private Creature player;
+	 private List<String> messages;
 
-	public ZombieAi(Creature creature, Creature player) {
+	public ZombieAi(Creature creature, Creature player, List<String> messages) {
 		super(creature);
 		this.player = player;
+		this.messages = messages;
 	}
 
 	public void onUpdate() {
@@ -29,4 +31,9 @@ public class ZombieAi extends CreatureAi {
 
 		creature.moveBy(creature,mx, my, 0);
 	}
+	
+	public void onNotify(String message) {
+		messages.add(message);
+	}
+
 }

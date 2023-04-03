@@ -158,7 +158,7 @@ public class PlayScreen implements Screen {
 	}
 
 	private void createWorld() {
-		world = new WorldBuilder(90, 31, 1).makeCaves().build();
+		world = new WorldBuilder(90, 31, 3).makeCaves().build();
 	}
 
 	public int getPlayerX() {
@@ -196,19 +196,19 @@ public class PlayScreen implements Screen {
 		player = creatureFactory.newPlayer(messages, fov);
 
 		for (int i = 0; i < 10; i++) {
-			creatureFactory.newFungus();
+			creatureFactory.newFungus(messages);
 		}
 
 		for (int i = 0; i < 20; i++) {
-			creatureFactory.newBat();
+			creatureFactory.newBat(messages);
 		}
 
 		for (int i = 0; i < 5; i++) {
-			creatureFactory.newZombie(player);
+			creatureFactory.newZombie(player, messages);
 		}
 		
 		for (int i = 0; i < 3; i++) {
-			creatureFactory.newGoblin(player);
+			creatureFactory.newGoblin(player, messages);
 		}
 	}
 
