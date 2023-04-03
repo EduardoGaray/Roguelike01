@@ -22,37 +22,37 @@ public class EntityFactory {
 		return player;
 	}
 
-	public Creature newFungus(List<String> messages) {
+	public Creature newFungus() {
 		List<Effect> effects = new ArrayList<Effect>();
 		Creature fungus = new Creature(world, 'f', AsciiPanel.green, 10, 10, 0, 0, "creature", 10, "Fungi", effects);
 		Random rand = new Random();
 		int randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(fungus, randomDepth);
-		new FungusAi(fungus, this, messages);
+		new FungusAi(fungus, this);
 		return fungus;
 	}
 
-	public Creature newBat(List<String> messages) {
+	public Creature newBat() {
 		List<Effect> effects = new ArrayList<Effect>();
 		Creature bat = new Creature(world, 'b', AsciiPanel.yellow, 15, 15, 0, 0, "creature", 10, "Cave Bat", effects);
 		Random rand = new Random();
 		int randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(bat, randomDepth);
-		new BatAi(bat, messages);
+		new BatAi(bat);
 		return bat;
 	}
 
-	public Creature newZombie(Creature player, List<String> messages) {
+	public Creature newZombie(Creature player) {
 		List<Effect> effects = new ArrayList<Effect>();
 		Creature zombie = new Creature(world, 'z', AsciiPanel.white, 50, 50, 10, 0, "creature", 10, "Zombie", effects);
 		Random rand = new Random();
 		int randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(zombie, randomDepth);
-		new ZombieAi(zombie, player, messages);
+		new ZombieAi(zombie, player);
 		return zombie;
 	}
 
-	public Creature newGoblin(Creature player, List<String> messages) {
+	public Creature newGoblin(Creature player) {
 		List<Effect> effects = new ArrayList<Effect>();
 		Creature goblin = new Creature(world, 'g', AsciiPanel.brightGreen, 66, 66, 5, 0, "creature", 10, "Goblin", effects);
 		Random rand = new Random();
@@ -63,7 +63,7 @@ public class EntityFactory {
 		goblin.equip(randomArmor(randomDepth));
 		randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(goblin, randomDepth);
-		new GoblinAi(goblin, player, messages);
+		new GoblinAi(goblin, player);
 		return goblin;
 	}
 
