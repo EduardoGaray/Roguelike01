@@ -183,4 +183,9 @@ public class World {
         }
     }
 }
+
+	public void add(Creature other) {
+		// TODO Auto-generated method stub
+		
+	}
 }

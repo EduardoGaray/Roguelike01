@@ -1,6 +1,8 @@
 package rl01.Main;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Item {
 
@@ -64,10 +66,11 @@ public class Item {
 		defenseValue += amount;
 	}
 
-	public Item(char glyph, Color color, String name) {
+	public Item(char glyph, Color color, String name, List<Spell> writtenSpells) {
 		this.glyph = glyph;
 		this.color = color;
 		this.name = name;
+		this.writtenSpells = new ArrayList<Spell>();
 	}
 
 	public String details() {
@@ -87,4 +90,19 @@ public class Item {
 
 		return details;
 	}
+	
+	private List<Spell> writtenSpells;
+    public List<Spell> writtenSpells() { return writtenSpells; }
+
+    public void addWrittenSpell(String name, int manaCost, Effect effect){
+        writtenSpells.add(new Spell(name, manaCost, effect));
+    }
+    
+    private String appearance;
+    public String appearance() { 
+        if (appearance == null)
+            return name;
+
+        return appearance;
+    }
 }

@@ -1,6 +1,5 @@
 package rl01.Main;
 
-import java.util.List;
 
 public class FungusAi extends CreatureAi {
 	
@@ -26,7 +25,7 @@ public class FungusAi extends CreatureAi {
         if (!creature.canEnter(x, y, z))
             return;
   
-        Creature child = factory.newFungus();
+        Creature child = factory.newFungus(z);
         child.x = x;
         child.y = y;
         child.z = z;

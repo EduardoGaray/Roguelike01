@@ -11,7 +11,6 @@ import rl01.Main.Creature;
 import rl01.Main.EntityFactory;
 import rl01.Main.FieldOfView;
 import rl01.Main.Item;
-import rl01.Main.PlayerAi;
 import rl01.Main.Tile;
 import rl01.Main.World;
 import rl01.Main.WorldBuilder;
@@ -38,7 +37,8 @@ public class PlayScreen implements Screen {
 
 		terminal.write(player.glyph(), player.x - left, player.y - top, player.color());
 
-		String stats = String.format(" %3d/%3d hp %8s", player.hp(), player.maxHp(), hunger());
+		String stats = String.format(" %3d/%3d hp  %d/%d mana  %8s", 
+			    player.maxHp(), player.hp(), player.maxMana(), player.mana(), hunger());  
 		terminal.write(stats, 1, 21);
 		String level = String.format(" Floor: %3d", player.z + 1);
 		terminal.write(level, 1, 22);
@@ -136,6 +136,9 @@ public class PlayScreen implements Screen {
 			case KeyEvent.VK_Q:
 				subscreen = new QuaffScreen(player);
 				break;
+			case KeyEvent.VK_R:
+				subscreen = new ReadScreen(player, player.x - left, player.y - top);
+				break;
 			}
 		}
 
@@ -213,22 +216,22 @@ public class PlayScreen implements Screen {
 
 		for (int i = 0; i < 10; i++) {
 			randomDepth = rand.nextInt(world.depth());
-			creatureFactory.newFungus();
+			creatureFactory.newFungus(randomDepth);
 		}
 
 		for (int i = 0; i < 20; i++) {
 			randomDepth = rand.nextInt(world.depth());
-			creatureFactory.newBat();
+			creatureFactory.newBat(randomDepth);
 		}
 
 		for (int i = 0; i < 5; i++) {
 			randomDepth = rand.nextInt(world.depth());
-			creatureFactory.newZombie(player);
+			creatureFactory.newZombie(player,randomDepth);
 		}
 
 		for (int i = 0; i < 3; i++) {
 			randomDepth = rand.nextInt(world.depth());
-			creatureFactory.newGoblin(player);
+			creatureFactory.newGoblin(player,randomDepth);
 		}
 	}
 

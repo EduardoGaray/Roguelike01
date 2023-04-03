@@ -15,87 +15,86 @@ public class EntityFactory {
 
 	public Creature newPlayer(List<String> messages, FieldOfView fov) {
 		List<Effect> effects = new ArrayList<Effect>();
-		Creature player = new Creature(world, '@', AsciiPanel.brightWhite, 50, 50, 10, 50, "player", 10, "Player", effects);
+		Creature player = new Creature(world, '@', AsciiPanel.brightWhite, 50, 50, 10, 50, 0, 0, "player", 10, 0, 0, "Player", effects);
 		world.addAtEmptyLocation(player, 0);
 		System.out.println("Spawning player on level: 0");
 		new PlayerAi(player, world, messages, fov);
 		return player;
 	}
 
-	public Creature newFungus() {
+	public Creature newFungus(int depth) {
 		List<Effect> effects = new ArrayList<Effect>();
-		Creature fungus = new Creature(world, 'f', AsciiPanel.green, 10, 10, 0, 0, "creature", 1, "Fungi", effects);
-		Random rand = new Random();
-		int randomDepth = rand.nextInt(world.depth());
-		world.addAtEmptyLocation(fungus, randomDepth);
+		Creature fungus = new Creature(world, 'f', AsciiPanel.green, 10, 10, 0, 0, 0, 0, "creature", 1, 0, 0, "Fungi", effects);
+		world.addAtEmptyLocation(fungus, depth);
 		new FungusAi(fungus, this);
 		return fungus;
 	}
 
-	public Creature newBat() {
+	public Creature newBat(int depth) {
 		List<Effect> effects = new ArrayList<Effect>();
-		Creature bat = new Creature(world, 'b', AsciiPanel.yellow, 15, 15, 0, 0, "creature", 18, "Cave Bat", effects);
-		Random rand = new Random();
-		int randomDepth = rand.nextInt(world.depth());
-		world.addAtEmptyLocation(bat, randomDepth);
+		Creature bat = new Creature(world, 'b', AsciiPanel.yellow, 15, 15, 0, 0, 0, 0, "creature", 18, 0, 0, "Cave Bat", effects);
+		world.addAtEmptyLocation(bat, depth);
 		new BatAi(bat);
 		return bat;
 	}
 
-	public Creature newZombie(Creature player) {
+	public Creature newZombie(Creature player, int depth) {
 		List<Effect> effects = new ArrayList<Effect>();
-		Creature zombie = new Creature(world, 'z', AsciiPanel.white, 50, 50, 10, 0, "creature", 5, "Zombie", effects);
-		Random rand = new Random();
-		int randomDepth = rand.nextInt(world.depth());
-		world.addAtEmptyLocation(zombie, randomDepth);
+		Creature zombie = new Creature(world, 'z', AsciiPanel.white, 50, 50, 10, 0, 0, 0, "creature", 5, 0, 0, "Zombie", effects);
+		world.addAtEmptyLocation(zombie, depth);
 		new ZombieAi(zombie, player);
 		return zombie;
 	}
 
-	public Creature newGoblin(Creature player) {
+	public Creature newGoblin(Creature player, int depth) {
 		List<Effect> effects = new ArrayList<Effect>();
-		Creature goblin = new Creature(world, 'g', AsciiPanel.brightGreen, 66, 66, 5, 0, "creature", 10, "Goblin", effects);
+		Creature goblin = new Creature(world, 'g', AsciiPanel.brightGreen, 66, 66, 5, 0, 0, 0, "creature", 10, 0, 0, "Goblin", effects);
 		Random rand = new Random();
-		int randomDepth = rand.nextInt(world.depth());
-		randomDepth = rand.nextInt(world.depth());
-		goblin.equip(randomWeapon(randomDepth));
-		randomDepth = rand.nextInt(world.depth());
-		goblin.equip(randomArmor(randomDepth));
-		randomDepth = rand.nextInt(world.depth());
-		world.addAtEmptyLocation(goblin, randomDepth);
+		int random = rand.nextInt(world.depth());
+		random = rand.nextInt(world.depth());
+		goblin.equip(randomWeapon(random));
+		random = rand.nextInt(world.depth());
+		goblin.equip(randomArmor(random));
+		random = rand.nextInt(world.depth());
+		world.addAtEmptyLocation(goblin, depth);
 		new GoblinAi(goblin, player);
 		return goblin;
 	}
 
 	public Item newRock(int depth) {
-		Item item = new Item(',', AsciiPanel.yellow, "rock");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+		Item item = new Item(',', AsciiPanel.yellow, "rock",writtenSpells);
 		item.modifyThrownAttackValue(5);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
 
 	public Item newVictoryItem(int depth) {
-		Item item = new Item('*', AsciiPanel.brightWhite, "teddy bear");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+		Item item = new Item('*', AsciiPanel.brightWhite, "teddy bear",writtenSpells);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
 
 	public Item newDagger(int depth) {
-		Item item = new Item(')', AsciiPanel.white, "dagger");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+		Item item = new Item(')', AsciiPanel.white, "dagger",writtenSpells);
 		item.modifyAttackValue(5);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
 
 	public Item newSword(int depth) {
-		Item item = new Item(')', AsciiPanel.brightWhite, "sword");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+		Item item = new Item(')', AsciiPanel.brightWhite, "sword",writtenSpells);
 		item.modifyAttackValue(10);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
 
 	public Item newStaff(int depth) {
-		Item item = new Item(')', AsciiPanel.yellow, "staff");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+		Item item = new Item(')', AsciiPanel.yellow, "staff",writtenSpells);
 		item.modifyAttackValue(5);
 		item.modifyDefenseValue(3);
 		world.addAtEmptyLocation(item, depth);
@@ -103,28 +102,32 @@ public class EntityFactory {
 	}
 
 	public Item newLightArmor(int depth) {
-		Item item = new Item('[', AsciiPanel.green, "tunic");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+		Item item = new Item('[', AsciiPanel.green, "tunic",writtenSpells);
 		item.modifyDefenseValue(2);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
 
 	public Item newMediumArmor(int depth) {
-		Item item = new Item('[', AsciiPanel.white, "chainmail");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+		Item item = new Item('[', AsciiPanel.white, "chainmail",writtenSpells);
 		item.modifyDefenseValue(4);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
 
 	public Item newHeavyArmor(int depth) {
-		Item item = new Item('[', AsciiPanel.brightWhite, "platemail");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+		Item item = new Item('[', AsciiPanel.brightWhite, "platemail",writtenSpells);
 		item.modifyDefenseValue(6);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
 
 	public Item newEdibleWeapon(int depth) {
-		Item item = new Item(')', AsciiPanel.yellow, "baguette");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+		Item item = new Item(')', AsciiPanel.yellow, "baguette",writtenSpells);
 		item.modifyAttackValue(3);
 		item.modifyFoodValue(50);
 		world.addAtEmptyLocation(item, depth);
@@ -132,7 +135,8 @@ public class EntityFactory {
 	}
 
 	public Item newBow(int depth) {
-		Item item = new Item(')', AsciiPanel.yellow, "bow");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+		Item item = new Item(')', AsciiPanel.yellow, "bow",writtenSpells);
 		item.modifyAttackValue(1);
 		item.modifyRangedAttackValue(5);
 		world.addAtEmptyLocation(item, depth);
@@ -140,7 +144,8 @@ public class EntityFactory {
 	}
 	
 	public Item newPotionOfHealth(int depth){
-	    Item item = new Item('!', AsciiPanel.white, "health potion");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+	    Item item = new Item('!', AsciiPanel.white, "health potion",writtenSpells);
 	    item.setQuaffEffect(new Effect(1){
 	        public void start(Creature creature){
 	            if (creature.hp() == creature.maxHp())
@@ -156,7 +161,8 @@ public class EntityFactory {
 	}
 	
 	public Item newPotionOfPoison(int depth){
-	    Item item = new Item('!', AsciiPanel.white, "poison potion");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+	    Item item = new Item('!', AsciiPanel.white, "poison potion",writtenSpells);
 	    item.setQuaffEffect(new Effect(20){
 	        public void start(Creature creature){
 	            creature.doAction("look sick");
@@ -173,7 +179,8 @@ public class EntityFactory {
 	}
 	
 	public Item newPotionOfWarrior(int depth){
-	    Item item = new Item('!', AsciiPanel.white, "warrior's potion");
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+	    Item item = new Item('!', AsciiPanel.white, "warrior's potion",writtenSpells);
 	    item.setQuaffEffect(new Effect(20){
 	        public void start(Creature creature){
 	            creature.buffAttackValue(5);
@@ -190,6 +197,134 @@ public class EntityFactory {
 	    world.addAtEmptyLocation(item, depth);
 	    return item;
 	}
+	
+	
+	public Item newWhiteMagesSpellbook(int depth) {
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+        Item item = new Item('+', AsciiPanel.brightWhite, "white mage's spellbook", writtenSpells);
+        item.addWrittenSpell("minor heal", 4, new Effect(1){
+            public void start(Creature creature){
+                if (creature.hp() == creature.maxHp())
+                    return;
+                
+                creature.modifyHp(20);
+                creature.doAction("look healthier");
+            }
+        });
+        
+        item.addWrittenSpell("major heal", 8, new Effect(1){
+            public void start(Creature creature){
+                if (creature.hp() == creature.maxHp())
+                    return;
+                
+                creature.modifyHp(50);
+                creature.doAction("look healthier");
+            }
+        });
+        
+        item.addWrittenSpell("slow heal", 12, new Effect(50){
+            public void update(Creature creature){
+                super.update(creature);
+                creature.modifyHp(2);
+            }
+        });
+
+        item.addWrittenSpell("inner strength", 16, new Effect(50){
+            public void start(Creature creature){
+                creature.buffAttackValue(2);
+                creature.modifyRegenHpPer1000(10);
+                creature.modifyRegenManaPer1000(-10);
+                creature.doAction("seem to glow with inner strength");
+            }
+            public void update(Creature creature){
+                super.update(creature);
+                if (Math.random() < 0.25)
+                    creature.modifyHp(1);
+            }
+            public void end(Creature creature){
+                creature.buffAttackValue(-2);
+                creature.modifyRegenHpPer1000(-10);
+                creature.modifyRegenManaPer1000(10);
+            }
+        });
+        
+        world.addAtEmptyLocation(item, depth);
+        return item;
+    }
+	
+	
+	public Item newBlueMagesSpellbook(int depth) {
+		List<Spell> writtenSpells = new ArrayList<Spell>();
+        Item item = new Item('+', AsciiPanel.brightBlue, "blue mage's spellbook", writtenSpells );
+
+        item.addWrittenSpell("blood to mana", 1, new Effect(1){
+            public void start(Creature creature){
+                int amount = Math.min(creature.hp() - 1, creature.maxMana() - creature.mana());
+                creature.modifyHp(-amount);
+                creature.modifyMana(amount);
+            }
+        });
+        
+        item.addWrittenSpell("blink", 6, new Effect(1){
+            public void start(Creature creature){
+                creature.doAction("fade out");
+                
+                int mx = 0;
+                int my = 0;
+                
+                do
+                {
+                    mx = (int)(Math.random() * 11) - 5;
+                    my = (int)(Math.random() * 11) - 5;
+                }
+                while (!creature.canEnter(creature.x+mx, creature.y+my, creature.z)
+                        && creature.canSee(creature.x+mx, creature.y+my, creature.z));
+                
+                creature.moveBy(creature, mx, my, 0);
+                
+                creature.doAction("fade in");
+            }
+        });
+        
+        item.addWrittenSpell("summon bats", 11, new Effect(1){
+            public void start(Creature creature){
+                for (int ox = -1; ox < 2; ox++){
+                    for (int oy = -1; oy < 2; oy++){
+                        int nx = creature.x + ox;
+                        int ny = creature.y + oy;
+                        if (ox == 0 && oy == 0 
+                                || creature.creature(nx, ny, creature.z) != null)
+                            continue;
+                        
+                        Creature bat = newBat(0);
+                        
+                        if (!bat.canEnter(nx, ny, creature.z)){
+                            world.remove(bat);
+                            continue;
+                        }
+                        
+                        bat.x = nx;
+                        bat.y = ny;
+                        bat.z = creature.z;
+                        
+                        creature.summon(bat);
+                    }
+                }
+            }
+        });
+        
+        item.addWrittenSpell("detect creatures", 16, new Effect(75){
+            public void start(Creature creature){
+                creature.doAction("look far off into the distance");
+                creature.modifyDetectCreatures(1);
+            }
+            public void end(Creature creature){
+                creature.modifyDetectCreatures(-1);
+            }
+        });
+        world.addAtEmptyLocation(item, depth);
+        return item;
+    }
 	
 	public Item randomPotion(int depth){
         switch ((int)(Math.random() * 3)){
