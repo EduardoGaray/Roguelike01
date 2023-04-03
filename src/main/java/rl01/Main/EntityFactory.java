@@ -1,5 +1,6 @@
 package rl01.Main;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import asciiPanel.AsciiPanel;
@@ -13,7 +14,8 @@ public class EntityFactory {
 	}
 
 	public Creature newPlayer(List<String> messages, FieldOfView fov) {
-		Creature player = new Creature(world, '@', AsciiPanel.brightWhite, 100, 20, 5, "player", 9, "Player");
+		List<Effect> effects = new ArrayList<Effect>();
+		Creature player = new Creature(world, '@', AsciiPanel.brightWhite, 50, 50, 10, 50, "player", 10, "Player", effects);
 		world.addAtEmptyLocation(player, 0);
 		System.out.println("Spawning player on level: 0");
 		new PlayerAi(player, world, messages, fov);
@@ -21,7 +23,8 @@ public class EntityFactory {
 	}
 
 	public Creature newFungus(List<String> messages) {
-		Creature fungus = new Creature(world, 'f', AsciiPanel.green, 10, 0, 0, "creature", 9, "Fungi");
+		List<Effect> effects = new ArrayList<Effect>();
+		Creature fungus = new Creature(world, 'f', AsciiPanel.green, 10, 10, 0, 0, "creature", 10, "Fungi", effects);
 		Random rand = new Random();
 		int randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(fungus, randomDepth);
@@ -30,27 +33,45 @@ public class EntityFactory {
 	}
 
 	public Creature newBat(List<String> messages) {
-		Creature bat = new Creature(world, 'b', AsciiPanel.yellow, 15, 5, 0, "creature", 9, "Cave Bat");
+		List<Effect> effects = new ArrayList<Effect>();
+		Creature bat = new Creature(world, 'b', AsciiPanel.yellow, 15, 15, 0, 0, "creature", 10, "Cave Bat", effects);
 		Random rand = new Random();
 		int randomDepth = rand.nextInt(world.depth());
 		world.addAtEmptyLocation(bat, randomDepth);
 		new BatAi(bat, messages);
 		return bat;
 	}
-	
-	public Creature newZombie(Creature player, List<String> messages){
-	      Creature zombie = new Creature(world, 'z', AsciiPanel.white,50, 10, 10, "creature", 9, "Zombie");
-	      Random rand = new Random();
-		  int randomDepth = rand.nextInt(world.depth());
-	      world.addAtEmptyLocation(zombie,randomDepth);
-	      new ZombieAi(zombie, player, messages);
-	      return zombie;
-	  }
+
+	public Creature newZombie(Creature player, List<String> messages) {
+		List<Effect> effects = new ArrayList<Effect>();
+		Creature zombie = new Creature(world, 'z', AsciiPanel.white, 50, 50, 10, 0, "creature", 10, "Zombie", effects);
+		Random rand = new Random();
+		int randomDepth = rand.nextInt(world.depth());
+		world.addAtEmptyLocation(zombie, randomDepth);
+		new ZombieAi(zombie, player, messages);
+		return zombie;
+	}
+
+	public Creature newGoblin(Creature player, List<String> messages) {
+		List<Effect> effects = new ArrayList<Effect>();
+		Creature goblin = new Creature(world, 'g', AsciiPanel.brightGreen, 66, 66, 5, 0, "creature", 10, "Goblin", effects);
+		Random rand = new Random();
+		int randomDepth = rand.nextInt(world.depth());
+		randomDepth = rand.nextInt(world.depth());
+		goblin.equip(randomWeapon(randomDepth));
+		randomDepth = rand.nextInt(world.depth());
+		goblin.equip(randomArmor(randomDepth));
+		randomDepth = rand.nextInt(world.depth());
+		world.addAtEmptyLocation(goblin, randomDepth);
+		new GoblinAi(goblin, player, messages);
+		return goblin;
+	}
 
 	public Item newRock(int depth) {
-		Item rock = new Item(',', AsciiPanel.yellow, "rock");
-		world.addAtEmptyLocation(rock, depth);
-		return rock;
+		Item item = new Item(',', AsciiPanel.yellow, "rock");
+		item.modifyThrownAttackValue(5);
+		world.addAtEmptyLocation(item, depth);
+		return item;
 	}
 
 	public Item newVictoryItem(int depth) {
@@ -102,12 +123,90 @@ public class EntityFactory {
 		return item;
 	}
 
+	public Item newEdibleWeapon(int depth) {
+		Item item = new Item(')', AsciiPanel.yellow, "baguette");
+		item.modifyAttackValue(3);
+		item.modifyFoodValue(50);
+		world.addAtEmptyLocation(item, depth);
+		return item;
+	}
+
+	public Item newBow(int depth) {
+		Item item = new Item(')', AsciiPanel.yellow, "bow");
+		item.modifyAttackValue(1);
+		item.modifyRangedAttackValue(5);
+		world.addAtEmptyLocation(item, depth);
+		return item;
+	}
+	
+	public Item newPotionOfHealth(int depth){
+	    Item item = new Item('!', AsciiPanel.white, "health potion");
+	    item.setQuaffEffect(new Effect(1){
+	        public void start(Creature creature){
+	            if (creature.hp() == creature.maxHp())
+	                return;
+	                                
+	            creature.modifyHp(15);
+	            creature.doAction("look healthier");
+	        }
+	    });
+	                
+	    world.addAtEmptyLocation(item, depth);
+	    return item;
+	}
+	
+	public Item newPotionOfPoison(int depth){
+	    Item item = new Item('!', AsciiPanel.white, "poison potion");
+	    item.setQuaffEffect(new Effect(20){
+	        public void start(Creature creature){
+	            creature.doAction("look sick");
+	        }
+	                        
+	        public void update(Creature creature){
+	            super.update(creature);
+	            creature.modifyHp(-1);
+	        }
+	    });
+	                
+	    world.addAtEmptyLocation(item, depth);
+	    return item;
+	}
+	
+	public Item newPotionOfWarrior(int depth){
+	    Item item = new Item('!', AsciiPanel.white, "warrior's potion");
+	    item.setQuaffEffect(new Effect(20){
+	        public void start(Creature creature){
+	            creature.buffAttackValue(5);
+	            creature.buffAttackValue(5);
+	            creature.doAction("look stronger");
+	        }
+	        public void end(Creature creature){
+	            creature.buffAttackValue(-5);
+	            creature.buffAttackValue(-5);
+	            creature.doAction("look less strong");
+	        }
+	    });
+	                
+	    world.addAtEmptyLocation(item, depth);
+	    return item;
+	}
+	
+	public Item randomPotion(int depth){
+        switch ((int)(Math.random() * 3)){
+        case 0: return newPotionOfHealth(depth);
+        case 1: return newPotionOfPoison(depth);
+        default: return newPotionOfWarrior(depth);
+        }
+}
+
 	public Item randomWeapon(int depth) {
 		switch ((int) (Math.random() * 3)) {
 		case 0:
 			return newDagger(depth);
 		case 1:
 			return newSword(depth);
+		case 2:
+			return newBow(depth);
 		default:
 			return newStaff(depth);
 		}
@@ -123,13 +222,5 @@ public class EntityFactory {
 			return newHeavyArmor(depth);
 		}
 	}
-
-	public Item newEdibleWeapon(int depth) {
-		Item item = new Item(')', AsciiPanel.yellow, "baguette");
-		item.modifyAttackValue(3);
-		item.modifyFoodValue(50);
-		world.addAtEmptyLocation(item, depth);
-		return item;
-	}
-
+	
 }
