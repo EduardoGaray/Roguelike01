@@ -3,6 +3,7 @@ package rl01.Main;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Item {
 
@@ -66,11 +67,12 @@ public class Item {
 		defenseValue += amount;
 	}
 
-	public Item(char glyph, Color color, String name, List<Spell> writtenSpells) {
+	public Item(char glyph, Color color, String name, List<Spell> writtenSpells, String appearance) {
 		this.glyph = glyph;
 		this.color = color;
 		this.name = name;
 		this.writtenSpells = new ArrayList<Spell>();
+		this.appearance = appearance;
 	}
 
 	public String details() {

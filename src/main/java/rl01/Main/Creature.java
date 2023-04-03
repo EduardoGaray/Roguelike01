@@ -138,15 +138,6 @@ public class Creature {
 		doAction("dig");
 	}
 
-	public void modifyHp(int amount) {
-		hp += amount;
-		if (hp < 1) {
-			doAction("die");
-			leaveCorpse();
-			world.remove(this);
-		}
-	}
-
 	private int regenHpCooldown;
 	private int regenHpPer1000;
 
@@ -157,7 +148,7 @@ public class Creature {
 	private void regenerateHealth() {
 		regenHpCooldown -= regenHpPer1000;
 		if (regenHpCooldown < 0) {
-			modifyHp(1);
+			modifyHp(1, causeOfDeath);
 			modifyFood(-1);
 			regenHpCooldown += 1000;
 		}
@@ -190,7 +181,7 @@ public class Creature {
 
 	private void leaveCorpse() {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item corpse = new Item('%', color, name + " corpse", writtenSpells );
+		Item corpse = new Item('%', color, name + " corpse", writtenSpells, name );
 		corpse.modifyFoodValue(maxHp);
 		world.addAtEmptySpace(corpse, x, y, z);
 		for (Item item : inventory.getItems()) {
@@ -241,25 +232,50 @@ public class Creature {
 		ai.onNotify(String.format(message, params));
 	}
 
-	public void doAction(String message, Object... params) {
-		int r = visionRadius;
-		for (int ox = -r; ox < r + 1; ox++) {
-			for (int oy = -r; oy < r + 1; oy++) {
-				if (ox * ox + oy * oy > r * r)
-					continue;
-
-				Creature other = world.creature(x + ox, y + oy, z);
-
-				if (other == null)
-					continue;
-
-				if (tag.equals("player"))
-					other.notify("You " + message + ".", params);
-				else if (other.canSee(x, y, z))
-					other.notify(String.format("The %s %s.", name, makeSecondPerson(message)), params);
-			}
-		}
+	public void doAction(String message, Object ... params){
+	    for (Creature other : getCreaturesWhoSeeMe()){
+	        if (other == this){
+	            other.notify("You " + message + ".", params);
+	        } else {
+	            other.notify(String.format("The %s %s.", name, makeSecondPerson(message)), params);
+	        }
+	    }
 	}
+	
+	public void doAction(Item item, String message, Object ... params){
+	    if (hp < 1)
+	        return;
+	  
+	    for (Creature other : getCreaturesWhoSeeMe()){
+	        if (other == this){
+	            other.notify("You " + message + ".", params);
+	        } else {
+	            other.notify(String.format("The %s %s.", name, makeSecondPerson(message)), params);
+	        }
+	        other.learnName(item);
+	    }
+	}
+	 
+	private List<Creature> getCreaturesWhoSeeMe(){
+	    List<Creature> others = new ArrayList<Creature>();
+	    int r = visionRadius;
+	    for (int ox = -r; ox < r+1; ox++){
+	        for (int oy = -r; oy < r+1; oy++){
+	            if (ox*ox + oy*oy > r*r)
+	                continue;
+	    
+	            Creature other = world.creature(x+ox, y+oy, z);
+	    
+	            if (other == null)
+	                continue;
+	    
+	            others.add(other);
+	        }
+	    }
+	    return others;
+	}
+	
+	
 
 	private String makeSecondPerson(String text) {
 		String[] words = text.split(" ");
@@ -328,18 +344,18 @@ public class Creature {
 		return food;
 	}
 
-	public void modifyFood(int amount) {
-		food += amount;
-
-		if (food > maxFood) {
-			maxFood = maxFood + food / 2;
-			food = maxFood;
-			notify("You can't believe your stomach can hold that much!");
-			modifyHp(-1);
-		} else if (food < 1 && isPlayer()) {
-			modifyHp(-1000);
-		}
-	}
+	public void modifyFood(int amount) { 
+	    food += amount;
+	  
+	    if (food > maxFood) {
+	        maxFood = (maxFood + food) / 2;
+	        food = maxFood;
+	        notify("You can't belive your stomach can hold that much!");
+	        modifyHp(-1, "Killed by overeating.");
+	    } else if (food < 1 && isPlayer()) {
+	        modifyHp(-1000, "Starved to death.");
+	    }
+	 }
 
 	public boolean isPlayer() {
 		return glyph == '@';
@@ -404,7 +420,7 @@ public class Creature {
 			level++;
 			doAction("advance to level %d", level);
 			ai.onGainLevel();
-			modifyHp(level * 2);
+			modifyHp(level * 2, causeOfDeath);
 		}
 	}
 
@@ -511,7 +527,7 @@ public class Creature {
 
 		doAction("fire a %s at the %s for %d damage", weapon.name(), other.name, amount);
 
-		other.modifyHp(-amount);
+		other.modifyHp(-amount, causeOfDeath);
 
 		if (other.hp < 1)
 			gainXp(other);
@@ -532,7 +548,7 @@ public class Creature {
 
 		doAction(action, params2);
 
-		other.modifyHp(-amount);
+		other.modifyHp(-amount, causeOfDeath);
 
 		if (other.hp < 1)
 			gainXp(other);
@@ -621,5 +637,32 @@ public class Creature {
         other.addEffect(spell.effect());
         modifyMana(-spell.manaCost());
     }
+    
+    public String nameOf(Item item){
+        return ai.getName(item);
+    }
+     
+    public void learnName(Item item){
+        notify("The " + item.appearance() + " is a " + item.name() + "!");
+        ai.setName(item, item.name());
+    }
+    
+    private String causeOfDeath;
+    public String causeOfDeath() { return causeOfDeath; }
+    
+    public void modifyHp(int amount, String causeOfDeath) { 
+        hp += amount;
+        this.causeOfDeath = causeOfDeath;
+     
+        if (hp > maxHp) {
+            hp = maxHp;
+        } else if (hp < 1) {
+            doAction("die");
+            leaveCorpse();
+            world.remove(this);
+        }
+    }
+    
+    
 
 }

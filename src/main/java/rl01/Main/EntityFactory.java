@@ -1,7 +1,11 @@
 package rl01.Main;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import asciiPanel.AsciiPanel;
 import java.util.Random;
@@ -9,9 +13,15 @@ import java.util.Random;
 public class EntityFactory {
 	private World world;
 
-	public EntityFactory(World world) {
-		this.world = world;
-	}
+	  private Map<String, Color> potionColors;
+	    private List<String> potionAppearances;
+	 
+	    public EntityFactory(World world){
+	        this.world = world;
+	  
+	        setUpPotionAppearances();
+	    }
+	    
 
 	public Creature newPlayer(List<String> messages, FieldOfView fov) {
 		List<Effect> effects = new ArrayList<Effect>();
@@ -63,7 +73,7 @@ public class EntityFactory {
 
 	public Item newRock(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item item = new Item(',', AsciiPanel.yellow, "rock",writtenSpells);
+		Item item = new Item(',', AsciiPanel.yellow, "rock",writtenSpells, null );
 		item.modifyThrownAttackValue(5);
 		world.addAtEmptyLocation(item, depth);
 		return item;
@@ -71,14 +81,14 @@ public class EntityFactory {
 
 	public Item newVictoryItem(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item item = new Item('*', AsciiPanel.brightWhite, "teddy bear",writtenSpells);
+		Item item = new Item('*', AsciiPanel.brightWhite, "teddy bear",writtenSpells, null);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
 
 	public Item newDagger(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item item = new Item(')', AsciiPanel.white, "dagger",writtenSpells);
+		Item item = new Item(')', AsciiPanel.white, "dagger",writtenSpells, null);
 		item.modifyAttackValue(5);
 		world.addAtEmptyLocation(item, depth);
 		return item;
@@ -86,7 +96,7 @@ public class EntityFactory {
 
 	public Item newSword(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item item = new Item(')', AsciiPanel.brightWhite, "sword",writtenSpells);
+		Item item = new Item(')', AsciiPanel.brightWhite, "sword",writtenSpells, null);
 		item.modifyAttackValue(10);
 		world.addAtEmptyLocation(item, depth);
 		return item;
@@ -94,7 +104,7 @@ public class EntityFactory {
 
 	public Item newStaff(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item item = new Item(')', AsciiPanel.yellow, "staff",writtenSpells);
+		Item item = new Item(')', AsciiPanel.yellow, "staff",writtenSpells, null);
 		item.modifyAttackValue(5);
 		item.modifyDefenseValue(3);
 		world.addAtEmptyLocation(item, depth);
@@ -103,7 +113,7 @@ public class EntityFactory {
 
 	public Item newLightArmor(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item item = new Item('[', AsciiPanel.green, "tunic",writtenSpells);
+		Item item = new Item('[', AsciiPanel.green, "tunic",writtenSpells, null);
 		item.modifyDefenseValue(2);
 		world.addAtEmptyLocation(item, depth);
 		return item;
@@ -111,7 +121,7 @@ public class EntityFactory {
 
 	public Item newMediumArmor(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item item = new Item('[', AsciiPanel.white, "chainmail",writtenSpells);
+		Item item = new Item('[', AsciiPanel.white, "chainmail",writtenSpells, null);
 		item.modifyDefenseValue(4);
 		world.addAtEmptyLocation(item, depth);
 		return item;
@@ -119,7 +129,7 @@ public class EntityFactory {
 
 	public Item newHeavyArmor(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item item = new Item('[', AsciiPanel.brightWhite, "platemail",writtenSpells);
+		Item item = new Item('[', AsciiPanel.brightWhite, "platemail",writtenSpells, null);
 		item.modifyDefenseValue(6);
 		world.addAtEmptyLocation(item, depth);
 		return item;
@@ -127,7 +137,7 @@ public class EntityFactory {
 
 	public Item newEdibleWeapon(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item item = new Item(')', AsciiPanel.yellow, "baguette",writtenSpells);
+		Item item = new Item(')', AsciiPanel.yellow, "baguette",writtenSpells, null);
 		item.modifyAttackValue(3);
 		item.modifyFoodValue(50);
 		world.addAtEmptyLocation(item, depth);
@@ -136,7 +146,7 @@ public class EntityFactory {
 
 	public Item newBow(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item item = new Item(')', AsciiPanel.yellow, "bow",writtenSpells);
+		Item item = new Item(')', AsciiPanel.yellow, "bow",writtenSpells, null);
 		item.modifyAttackValue(1);
 		item.modifyRangedAttackValue(5);
 		world.addAtEmptyLocation(item, depth);
@@ -145,14 +155,16 @@ public class EntityFactory {
 	
 	public Item newPotionOfHealth(int depth){
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-	    Item item = new Item('!', AsciiPanel.white, "health potion",writtenSpells);
+		String appearance = potionAppearances.get(0);
+		final Item item = new Item('!', potionColors.get(appearance), "health potion", writtenSpells, appearance);
 	    item.setQuaffEffect(new Effect(1){
 	        public void start(Creature creature){
 	            if (creature.hp() == creature.maxHp())
 	                return;
 	                                
-	            creature.modifyHp(15);
+	            creature.modifyHp(15, appearance);
 	            creature.doAction("look healthier");
+	            creature.learnName(item);
 	        }
 	    });
 	                
@@ -162,15 +174,17 @@ public class EntityFactory {
 	
 	public Item newPotionOfPoison(int depth){
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-	    Item item = new Item('!', AsciiPanel.white, "poison potion",writtenSpells);
+		String appearance = potionAppearances.get(0);
+	    final Item item = new Item('!', potionColors.get(appearance), "poison potion", writtenSpells, appearance);
 	    item.setQuaffEffect(new Effect(20){
 	        public void start(Creature creature){
 	            creature.doAction("look sick");
+	            creature.learnName(item);
 	        }
 	                        
 	        public void update(Creature creature){
 	            super.update(creature);
-	            creature.modifyHp(-1);
+	            creature.modifyHp(-1, "Killed by poison.");
 	        }
 	    });
 	                
@@ -180,12 +194,14 @@ public class EntityFactory {
 	
 	public Item newPotionOfWarrior(int depth){
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-	    Item item = new Item('!', AsciiPanel.white, "warrior's potion",writtenSpells);
+		String appearance = potionAppearances.get(0);
+	    final Item item = new Item('!', potionColors.get(appearance), "warrior's potion", writtenSpells, appearance);
 	    item.setQuaffEffect(new Effect(20){
 	        public void start(Creature creature){
 	            creature.buffAttackValue(5);
 	            creature.buffAttackValue(5);
 	            creature.doAction("look stronger");
+	            creature.learnName(item);
 	        }
 	        public void end(Creature creature){
 	            creature.buffAttackValue(-5);
@@ -201,13 +217,13 @@ public class EntityFactory {
 	
 	public Item newWhiteMagesSpellbook(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-        Item item = new Item('+', AsciiPanel.brightWhite, "white mage's spellbook", writtenSpells);
+        Item item = new Item('+', AsciiPanel.brightWhite, "white mage's spellbook", writtenSpells, null);
         item.addWrittenSpell("minor heal", 4, new Effect(1){
             public void start(Creature creature){
                 if (creature.hp() == creature.maxHp())
                     return;
                 
-                creature.modifyHp(20);
+                creature.modifyHp(20, "Killed by overeating.");
                 creature.doAction("look healthier");
             }
         });
@@ -217,7 +233,7 @@ public class EntityFactory {
                 if (creature.hp() == creature.maxHp())
                     return;
                 
-                creature.modifyHp(50);
+                creature.modifyHp(50, "Killed by overeating.");
                 creature.doAction("look healthier");
             }
         });
@@ -225,7 +241,7 @@ public class EntityFactory {
         item.addWrittenSpell("slow heal", 12, new Effect(50){
             public void update(Creature creature){
                 super.update(creature);
-                creature.modifyHp(2);
+                creature.modifyHp(2, "Killed by overeating.");
             }
         });
 
@@ -239,7 +255,7 @@ public class EntityFactory {
             public void update(Creature creature){
                 super.update(creature);
                 if (Math.random() < 0.25)
-                    creature.modifyHp(1);
+                    creature.modifyHp(1, "Killed by debuff.");
             }
             public void end(Creature creature){
                 creature.buffAttackValue(-2);
@@ -255,12 +271,12 @@ public class EntityFactory {
 	
 	public Item newBlueMagesSpellbook(int depth) {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-        Item item = new Item('+', AsciiPanel.brightBlue, "blue mage's spellbook", writtenSpells );
+        Item item = new Item('+', AsciiPanel.brightBlue, "blue mage's spellbook", writtenSpells, null );
 
         item.addWrittenSpell("blood to mana", 1, new Effect(1){
             public void start(Creature creature){
                 int amount = Math.min(creature.hp() - 1, creature.maxMana() - creature.mana());
-                creature.modifyHp(-amount);
+                creature.modifyHp(-amount, "Killed by spell.");
                 creature.modifyMana(amount);
             }
         });
@@ -357,5 +373,21 @@ public class EntityFactory {
 			return newHeavyArmor(depth);
 		}
 	}
+	
+	private void setUpPotionAppearances(){
+        potionColors = new HashMap<String, Color>();
+        potionColors.put("red potion", AsciiPanel.brightRed);
+        potionColors.put("yellow potion", AsciiPanel.brightYellow);
+        potionColors.put("green potion", AsciiPanel.brightGreen);
+        potionColors.put("cyan potion", AsciiPanel.brightCyan);
+        potionColors.put("blue potion", AsciiPanel.brightBlue);
+        potionColors.put("magenta potion", AsciiPanel.brightMagenta);
+        potionColors.put("dark potion", AsciiPanel.brightBlack);
+        potionColors.put("grey potion", AsciiPanel.white);
+        potionColors.put("light potion", AsciiPanel.brightWhite);
+
+        potionAppearances = new ArrayList<String>(potionColors.keySet());
+        Collections.shuffle(potionAppearances);
+    }
 	
 }
