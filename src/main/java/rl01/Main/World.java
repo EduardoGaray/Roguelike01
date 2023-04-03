@@ -49,20 +49,30 @@ public class World {
 	public Item item(int x, int y, int z){
 	    return items[x][y][z];
 	}
-
-	public char glyph(int x, int y, int z){
-	    Creature creature = creature(x, y, z);
-	    if (creature != null)
-	        return creature.glyph();
-	    
-	    if (item(x,y,z) != null)
+	
+	public char tileglyph(int x, int y, int z){    
+		if (item(x,y,z) != null)
 	        return item(x,y,z).glyph();
 	    
 	    return tile(x, y, z).glyph();
 	}
+
+	public char glyph(int x, int y, int z){
+	    Creature creature = creature(x, y, z);
+	    if (creature != null && creature.z == z)
+	    {
+	    	 return creature.glyph();
+	    }	    	
+	    
+	    if (item(x,y,z) != null)
+	    {
+	    	return item(x,y,z).glyph();
+	    }
+	    return tile(x, y, z).glyph();
+	}
 	public Color color(int x, int y, int z){
 	    Creature creature = creature(x, y, z);
-	    if (creature != null)
+	    if (creature != null && creature.z == z)
 	        return creature.color();
 	    
 	    if (item(x,y,z) != null)

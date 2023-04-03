@@ -8,13 +8,13 @@ public class Creature {
 
 	private World world;
 	private FieldOfView fov;
-
+	
 	public int x;
 	public int y;
 	public int z;
 
 	public String tag;
-
+	
 	private int xp;
 
 	public int xp() {
@@ -199,15 +199,11 @@ public class Creature {
 				return;
 			}
 		}
-
 		Creature other = world.creature(x + mx, y + my, z + mz);
-
-		if (other == null || other.tag.equals(creature.tag)) {
+		if (other == null || other.tag.equals(creature.tag) || other.z != creature.z)  {
 			ai.onEnter(x + mx, y + my, z + mz, tile);
-		} else {
-
+		} else if(other.z == creature.z) {			
 			meleeAttack(other);
-
 		}
 	}
 
@@ -227,10 +223,10 @@ public class Creature {
 				if (other == null)
 					continue;
 
-				if (other.tag.equals("player"))
+				if (tag.equals("player"))
 					other.notify("You " + message + ".", params);
 				else if (other.canSee(x, y, z))
-					other.notify(String.format("The %s %s.", other.name, makeSecondPerson(message)), params);
+					other.notify(String.format("The %s %s.", name, makeSecondPerson(message)), params);
 			}
 		}
 	}

@@ -4,12 +4,10 @@ import java.util.List;
 
 public class GoblinAi extends CreatureAi {
 	private Creature player;
-	private List<String> messages;
 
-	public GoblinAi(Creature creature, Creature player, List<String> messages) {
+	public GoblinAi(Creature creature, Creature player ) {
 		super(creature);
 		this.player = player;
-		this.messages = messages;
 	}
 
 	public void onUpdate() {
@@ -96,9 +94,5 @@ public class GoblinAi extends CreatureAi {
 		int my = points.get(0).y - creature.y;
 
 		creature.moveBy(creature, mx, my, 0);
-	}
-
-	public void onNotify(String message) {
-		messages.add(message);
 	}
 }

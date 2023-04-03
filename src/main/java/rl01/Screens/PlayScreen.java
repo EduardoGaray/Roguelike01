@@ -127,11 +127,11 @@ public class PlayScreen implements Screen {
 				player.moveBy(player, 0, 0, 1);
 				break;
 			case KeyEvent.VK_F:
-		        if (player.weapon() == null || player.weapon().rangedAttackValue() == 0)
-		         player.notify("You don't have a ranged weapon equiped.");
-		        else
-		         subscreen = new FireWeaponScreen(player,player.x - left,player.y - top); 
-		        break;
+				if (player.weapon() == null || player.weapon().rangedAttackValue() == 0)
+					player.notify("You don't have a ranged weapon equiped.");
+				else
+					subscreen = new FireWeaponScreen(player, player.x - left, player.y - top);
+				break;
 			}
 		}
 
@@ -183,11 +183,21 @@ public class PlayScreen implements Screen {
 			for (int y = 0; y < screenHeight; y++) {
 				int wx = x + left;
 				int wy = y + top;
+				int wz = player.z;
 
-				if (player.canSee(wx, wy, player.z))
-					terminal.write(world.glyph(wx, wy, player.z), x, y, world.color(wx, wy, player.z));
-				else
+				if (player.canSee(wx, wy, wz)) {
+					Creature creature = world.creature(wx, wy, wz);
+					if (creature != null && creature.z == wz) {
+						terminal.write(creature.glyph(), creature.x - left, creature.y - top, creature.color());
+					} else {
+						terminal.write(world.glyph(wx, wy, wz), x, y, world.color(wx, wy, wz));
+
+					}
+
+				} else {
 					terminal.write(fov.tile(wx, wy, player.z).glyph(), x, y, Color.darkGray);
+				}
+
 			}
 		}
 	}
@@ -196,19 +206,19 @@ public class PlayScreen implements Screen {
 		player = creatureFactory.newPlayer(messages, fov);
 
 		for (int i = 0; i < 10; i++) {
-			creatureFactory.newFungus(messages);
+			creatureFactory.newFungus();
 		}
 
 		for (int i = 0; i < 20; i++) {
-			creatureFactory.newBat(messages);
+			creatureFactory.newBat();
 		}
 
 		for (int i = 0; i < 5; i++) {
-			creatureFactory.newZombie(player, messages);
+			creatureFactory.newZombie(player);
 		}
-		
+
 		for (int i = 0; i < 3; i++) {
-			creatureFactory.newGoblin(player, messages);
+			creatureFactory.newGoblin(player);
 		}
 	}
 
@@ -218,7 +228,7 @@ public class PlayScreen implements Screen {
 				factory.newRock(z);
 			}
 		}
-		
+
 		factory.newVictoryItem(world.depth() - 1);
 		factory.newEdibleWeapon(world.depth() - 1);
 		factory.randomArmor(world.depth() - 1);
