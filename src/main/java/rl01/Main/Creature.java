@@ -8,13 +8,13 @@ public class Creature {
 
 	private World world;
 	private FieldOfView fov;
-	
+
 	public int x;
 	public int y;
 	public int z;
 
 	public String tag;
-	
+
 	private int xp;
 
 	public int xp() {
@@ -109,8 +109,9 @@ public class Creature {
 		return inventory;
 	}
 
-	public Creature(World world, char glyph, Color color, int maxHp, int hp, int maxMana, int mana, int attack, int defense, String tag,
-			int visionRadius, int regenHpPer1000, int regenManaPer1000, String name, List<Effect> effects) {
+	public Creature(World world, char glyph, Color color, int maxHp, int hp, int maxMana, int mana, int attack,
+			int defense, String tag, int visionRadius, int regenHpPer1000, int regenManaPer1000, String name,
+			List<Effect> effects) {
 		this.world = world;
 		this.glyph = glyph;
 		this.color = color;
@@ -162,35 +163,44 @@ public class Creature {
 			regenHpCooldown += 1000;
 		}
 	}
-	
-	
-	private int maxMana;
-    public int maxMana() { return maxMana; }
-    
-    private int mana;
-    public int mana() { return mana; }
-    public void modifyMana(int amount) { mana = Math.max(0, Math.min(mana+amount, maxMana));}
-    
-    private int regenManaCooldown;
-    private int regenManaPer1000;
-    public void modifyRegenManaPer1000(int amount) { regenManaPer1000 += amount; }
 
-    private void regenerateMana(){
-        regenManaCooldown -= regenManaPer1000;
-        if (regenManaCooldown < 0){
-            if (mana < maxMana) {
-                modifyMana(1);
-                modifyFood(-1);
-            }
-            regenManaCooldown += 1000;
-        }
-    }
-    
-    
+	private int maxMana;
+
+	public int maxMana() {
+		return maxMana;
+	}
+
+	private int mana;
+
+	public int mana() {
+		return mana;
+	}
+
+	public void modifyMana(int amount) {
+		mana = Math.max(0, Math.min(mana + amount, maxMana));
+	}
+
+	private int regenManaCooldown;
+	private int regenManaPer1000;
+
+	public void modifyRegenManaPer1000(int amount) {
+		regenManaPer1000 += amount;
+	}
+
+	private void regenerateMana() {
+		regenManaCooldown -= regenManaPer1000;
+		if (regenManaCooldown < 0) {
+			if (mana < maxMana) {
+				modifyMana(1);
+				modifyFood(-1);
+			}
+			regenManaCooldown += 1000;
+		}
+	}
 
 	private void leaveCorpse() {
 		List<Spell> writtenSpells = new ArrayList<Spell>();
-		Item corpse = new Item('%', color, name + " corpse", writtenSpells );
+		Item corpse = new Item('%', color, name + " corpse", writtenSpells);
 		corpse.modifyFoodValue(maxHp);
 		world.addAtEmptySpace(corpse, x, y, z);
 		for (Item item : inventory.getItems()) {
@@ -230,9 +240,9 @@ public class Creature {
 			}
 		}
 		Creature other = world.creature(x + mx, y + my, z + mz);
-		if (other == null || other.tag.equals(creature.tag) || other.z != creature.z)  {
+		if (other == null || other.tag.equals(creature.tag) || other.z != creature.z) {
 			ai.onEnter(x + mx, y + my, z + mz, tile);
-		} else if(other.z == creature.z) {			
+		} else if (other.z == creature.z) {
 			meleeAttack(other);
 		}
 	}
@@ -274,10 +284,9 @@ public class Creature {
 		return builder.toString().trim();
 	}
 
-	public boolean canSee(int wx, int wy, int wz){
-        return (detectCreatures > 0 && world.creature(wx, wy, wz) != null
-                || ai.canSee(wx, wy, wz));
-    }
+	public boolean canSee(int wx, int wy, int wz) {
+		return (detectCreatures > 0 && world.creature(wx, wy, wz) != null || ai.canSee(wx, wy, wz));
+	}
 
 	public void pickup() {
 		Item item = world.item(x, y, z);
@@ -414,17 +423,17 @@ public class Creature {
 		if (amount > 0)
 			modifyXp(amount);
 	}
-	
-	public void gainMaxMana() {
-        maxMana += 5;
-        mana += 5;
-        doAction("look more magical");
-    }
 
-    public void gainRegenMana(){
-        regenManaPer1000 += 5;
-        doAction("look a little less tired");
-    }
+	public void gainMaxMana() {
+		maxMana += 5;
+		mana += 5;
+		doAction("look more magical");
+	}
+
+	public void gainRegenMana() {
+		regenManaPer1000 += 5;
+		doAction("look a little less tired");
+	}
 
 	public void gainMaxHp() {
 		maxHp += 10;
@@ -483,7 +492,13 @@ public class Creature {
 
 		unequip(item);
 		inventory.remove(item);
-		world.addAtEmptySpace(item, wx, wy, wz);
+
+		if (item.quaffEffect() != null && c != null) {
+			world.remove(item);
+			notify("The "+item.name()+" breaks!");
+		} else {
+			world.addAtEmptySpace(item, wx, wy, wz);
+		}		
 	}
 
 	private void throwAttack(Item item, Creature other) {
@@ -493,11 +508,9 @@ public class Creature {
 
 		amount = (int) (Math.random() * amount) + 1;
 
-		doAction("throw a %s at the %s for %d damage", item.name(), other.name, amount);
-
-		 commonAttack(other, attackValue / 2 + item.thrownAttackValue(), "throw a %s at the %s for %d damage", item.name(), other.name);
-		 other.addEffect(item.quaffEffect());
-
+		commonAttack(other, amount / 2 + item.thrownAttackValue(), "throw a %s at the %s for %d damage",
+				item.name(), other.name);
+		other.addEffect(item.quaffEffect());
 		if (other.hp < 1)
 			gainXp(other);
 	}
@@ -599,27 +612,30 @@ public class Creature {
 		attackValue = attackValue + i;
 
 	}
-	
+
 	public void summon(Creature other) {
-        world.add(other);
-    }
-	
+		world.add(other);
+	}
+
 	private int detectCreatures;
-    public void modifyDetectCreatures(int amount) { detectCreatures += amount; }
-    
-    public void castSpell(Spell spell, int x2, int y2) {
-        Creature other = creature(x2, y2, z);
-        
-        if (spell.manaCost() > mana){
-            doAction("point and mumble but nothing happens");
-            return;
-        } else if (other == null) {
-            doAction("point and mumble at nothing");
-            return;
-        }
-        
-        other.addEffect(spell.effect());
-        modifyMana(-spell.manaCost());
-    }
+
+	public void modifyDetectCreatures(int amount) {
+		detectCreatures += amount;
+	}
+
+	public void castSpell(Spell spell, int x2, int y2) {
+		Creature other = creature(x2, y2, z);
+
+		if (spell.manaCost() > mana) {
+			doAction("point and mumble but nothing happens");
+			return;
+		} else if (other == null) {
+			doAction("point and mumble at nothing");
+			return;
+		}
+
+		other.addEffect(spell.effect());
+		modifyMana(-spell.manaCost());
+	}
 
 }
